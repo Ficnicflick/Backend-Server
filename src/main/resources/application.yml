@@ -1,3 +1,6 @@
+jwt:
+  secret:
+    k1AuBqN@3A^D3&39FO7Z!yP2Qz4m+`XiT
 spring:
   # LOCAL DB
   datasource:
