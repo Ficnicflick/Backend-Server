@@ -1,6 +1,6 @@
 jwt:
   secret:
-    k1AuBqN@3A^D3&39FO7Z!yP2Qz4m+`XiT
+    VlwEyVBsYt9V7zq57TejMnVUyzblYcfPQye08f7MGVA9XkHa
 spring:
   # LOCAL DB
   datasource:

@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -23,17 +24,17 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
-    @Column(name = "username", updatable = false, unique = true, nullable = false)
+    @Column( updatable = false, unique = true, nullable = false)
     private String username;
 
     @Column(nullable = false)
     private String password;
 
-    @Column(name = "nickname", unique = true, nullable = false)
+    @Column(unique = true, nullable = false)
     private String nickname;
 
     @ElementCollection(fetch = FetchType.EAGER)
-    @Builder.Default
+    //@Builder.Default
     private List<String> roles = new ArrayList<>();
 
     @Column(nullable = false)
@@ -55,14 +56,18 @@ public class User implements UserDetails {
         this.email = email;
     }
 
+    public void encodePassword(PasswordEncoder passwordEncoder){
+        this.password = passwordEncoder.encode(password);
+    }
+
     @Override
     public String getPassword() {
-        return null;
+        return password;
     }
 
     @Override
     public String getUsername() {
-        return null;
+        return username;
     }
 
     @Override
