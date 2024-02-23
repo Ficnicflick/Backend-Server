@@ -1,5 +1,7 @@
 package com.example.BackendServer.common.auth.service;
 
+import com.example.BackendServer.common.exception.BaseException;
+import com.example.BackendServer.common.response.BaseResponseStatus;
 import com.example.BackendServer.domain.User;
 import com.example.BackendServer.domain.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +25,7 @@ public class CustomUserDetailService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         log.info("loadUserByUsername 정상 호출!");
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("존재하지 않는 사용자"));
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new BaseException(BaseResponseStatus.NON_EXIST_USER));
 
         Set<GrantedAuthority> grantedAuthorities = new HashSet<>();
         grantedAuthorities.add(new SimpleGrantedAuthority("USER"));

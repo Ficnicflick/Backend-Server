@@ -10,10 +10,11 @@ public enum BaseResponseStatus {
 
 
     /** client error - 4xx */
-    EXIST_EMAIL(false, HttpStatus.CONFLICT.value(), "이미 존재하는 회원입니다"),
+    EXIST_USER(false, HttpStatus.CONFLICT.value(), "이미 존재하는 회원입니다"),
     NON_EXIST_USER(false, HttpStatus.NOT_FOUND.value(), "존재하지 않는 회원입니다"),
-    WRONG_PASSWORD(false, HttpStatus.BAD_REQUEST.value(), "잘못된 비밀번호 입니다."),
-    EXIST_NICKNAME(false, HttpStatus.CONFLICT.value(), "이미 존재하는 이름입니다."),
+    WRONG_PASSWORD(false, HttpStatus.BAD_REQUEST.value(), "비밀번호가 일치하지 않습니다."),
+    WRONG_REQUEST_BODY(false, HttpStatus.BAD_REQUEST.value(), "입력 형식이 알맞지 않습니다."),
+    EXIST_NICKNAME(false, HttpStatus.CONFLICT.value(), "이미 존재하는 닉네임입니다."),
 
 
     /** server error - 5xx */
@@ -36,4 +37,5 @@ public enum BaseResponseStatus {
         this.code = code;
         this.message = message;
     }
+
 }

@@ -38,4 +38,8 @@ public class BaseResponse<T> {
         this.code = code;
         this.message = message;
     }
+
+    public void notValid(T messages){
+        result = messages;
+    }
 }
