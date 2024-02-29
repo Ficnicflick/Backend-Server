@@ -76,4 +76,9 @@ public class UserService {
 
 
     }
+
+    @Transactional
+    public TokenInfoResponse reissue(){
+        return null;
+    }
 }
