@@ -2,8 +2,9 @@ package com.example.BackendServer.domain;
 
 import com.example.BackendServer.common.auth.dto.TokenInfoResponse;
 import com.example.BackendServer.common.auth.service.JwtTokenProvider;
+import com.example.BackendServer.common.entity.RefreshToken;
 import com.example.BackendServer.common.exception.BaseException;
-import com.example.BackendServer.common.response.BaseResponseStatus;
+import com.example.BackendServer.common.repository.RefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -15,6 +16,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
+import java.util.Optional;
+
 import static com.example.BackendServer.common.response.BaseResponseStatus.*;
 
 @Service @Slf4j
@@ -22,6 +26,7 @@ import static com.example.BackendServer.common.response.BaseResponseStatus.*;
 @Transactional(readOnly = true)
 public class UserService {
     private final UserRepository userRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
@@ -66,7 +71,13 @@ public class UserService {
             Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
             log.info("authentication = {}", authentication);
 
-            return jwtTokenProvider.generateToken(authentication);
+            TokenInfoResponse response = jwtTokenProvider.generateToken(authentication);
+            
+            String refreshToken = response.getRefreshToken(); // refreshToken 저장
+            RefreshToken token = RefreshToken.of(authentication.getName(), refreshToken, "false", "false");
+            refreshTokenRepository.save(token);
+
+            return response;
 
         }catch (UsernameNotFoundException ex){
             throw new BaseException(NON_EXIST_USER);
@@ -78,7 +89,20 @@ public class UserService {
     }
 
     @Transactional
-    public TokenInfoResponse reissue(){
-        return null;
+    public TokenInfoResponse reissue(String refreshToken) {
+        Optional<RefreshToken> findRefreshToken = refreshTokenRepository.findByRefreshToken(refreshToken);
+
+        // 존재하지 않는 경우는 없음. 애초에 만료되어 사라진 토큰이라면 JwtAuthenticationFliter 단에서 미리 처리해버림.
+        RefreshToken result = findRefreshToken.get();
+        String token = result.getRefreshToken().substring(7);
+        String subject = jwtTokenProvider.extractSubject(token);
+        String auth = jwtTokenProvider.extractAuth(token);
+        long now = (new Date()).getTime();
+        String createdAccessToken = jwtTokenProvider.generateAccessToken(subject, auth, now);
+
+        return TokenInfoResponse.builder()
+                .accessToken(createdAccessToken)
+                .build();
+
     }
 }

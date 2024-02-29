@@ -1,7 +1,6 @@
 package com.example.BackendServer.domain;
 
 import com.example.BackendServer.common.auth.dto.TokenInfoResponse;
-import com.example.BackendServer.common.exception.BaseException;
 import com.example.BackendServer.common.response.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -11,6 +10,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.Value;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -40,6 +40,18 @@ public class UserController {
     public BaseResponse<TokenInfoResponse> userSignIn(@Valid @RequestBody UserSignInRequestDto dto){
 
         return new BaseResponse(userService.signIn(dto));
+    }
+
+
+    @PostMapping("/token/reissue")
+    public BaseResponse<TokenInfoResponse> userTokenReissue(@RequestHeader(name = "Authorization") String token/*, @RequestHeader(name = "isRefreshToken") String isRefreshToken*/){
+        /*if(!isRefreshToken.equals("true")){
+            //예외 처리 필요
+        }*/
+
+
+        return new BaseResponse(userService.reissue(token));
+
     }
     @GetMapping("/ping")
     private BaseResponse<?> ping(){

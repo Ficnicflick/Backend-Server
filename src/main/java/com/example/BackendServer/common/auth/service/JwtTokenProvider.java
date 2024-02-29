@@ -24,8 +24,8 @@ import java.util.stream.Collectors;
 public class JwtTokenProvider {
     private static final String AUTHORITIES_KEY = "auth";
     private static final String BEARER_TYPE = "Bearer ";
-    private static final long ACCESS_TOKEN_EXPIRE_TIME = 10 * 1000L;              // 30분
-    private static final long REFRESH_TOKEN_EXPIRE_TIME = 7 * 24 * 60 * 60 * 1000L;    // 7일
+    private static final long ACCESS_TOKEN_EXPIRE_TIME = /*30 * 60*/15 * 1000L;              // 30분
+    private static final long REFRESH_TOKEN_EXPIRE_TIME = /*7 * 24 * 60 * 60*/ 30 * 1000L;    // 7일
 
     private final Key key;
 
@@ -42,8 +42,8 @@ public class JwtTokenProvider {
                 .collect(Collectors.joining(","));
 
         long now = (new Date()).getTime();
-        String accessToken = generateAccessToken(authentication, authorities, now); // Access Token 생성
-        String refreshToken = generateRefreshToken(authentication, now); // Refresh Token 생성
+        String accessToken = generateAccessToken(authentication.getName(), authorities, now); // Access Token 생성
+        String refreshToken = generateRefreshToken(authentication.getName(), authorities, now); // Refresh Token 생성
 
         return TokenInfoResponse.builder()
                 .accessToken(accessToken)
@@ -51,21 +51,21 @@ public class JwtTokenProvider {
                 .build();
     }
 
-    private String generateRefreshToken(Authentication authentication, long now) {
+    public String generateRefreshToken(String name, String authorities, long now) {
         String refreshToken = BEARER_TYPE + Jwts.builder()
-                .subject(authentication.getName())
+                .setSubject(name)
+                .claim(AUTHORITIES_KEY, authorities)
                 .setExpiration(new Date(now + REFRESH_TOKEN_EXPIRE_TIME))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
         return refreshToken;
     }
 
-    private String generateAccessToken(Authentication authentication, String authorities, long now) {
-        Date accessTokenExpiresIn = new Date(now + ACCESS_TOKEN_EXPIRE_TIME);
+    public String generateAccessToken(String name, String authorities, long now) {
         String accessToken = BEARER_TYPE + Jwts.builder()
-                .subject(authentication.getName())
+                .setSubject(name)
                 .claim(AUTHORITIES_KEY, authorities)
-                .setExpiration(accessTokenExpiresIn)
+                .setExpiration(new Date(now + ACCESS_TOKEN_EXPIRE_TIME))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
         return accessToken;
@@ -73,7 +73,11 @@ public class JwtTokenProvider {
 
     // 토큰 정보를 검증하는 메서드
     public boolean validateToken(String token) {
-        Jwts.parser().setSigningKey(key).build().parseClaimsJws(token);
+        //Jwts.parser().setSigningKey(key).parseClaimsJwt(token).getBody();
+        Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token);
 
         return true;
         /*try {
@@ -111,13 +115,30 @@ public class JwtTokenProvider {
         return new UsernamePasswordAuthenticationToken(principal, "", authorities);
     }
 
-    private Claims parseClaims(String accessToken) {
+    private Claims parseClaims(String token) {
         try {
-            return Jwts.parser().setSigningKey(key).build().parseClaimsJws(accessToken).getBody();
+            return Jwts.parser().setSigningKey(key).parseClaimsJws(token).getBody();
         } catch (ExpiredJwtException e) {
             return e.getClaims();
         }
     }
+
+    public String extractSubject(String token) {
+        log.info("extractSubject 메소드 시작");
+        Claims claims2 = parseClaims(token);
+        log.info("내부 parseClaims 메소드 시작");
+        String subject = claims2.getSubject();
+        log.info("subject = {}", subject);
+
+        return subject;
+    }
+
+    public String extractAuth(String token) {
+        Claims claims = parseClaims(token);
+        String auth = claims.get("auth", String.class);
+        return auth;
+    }
+
 
 
 }
