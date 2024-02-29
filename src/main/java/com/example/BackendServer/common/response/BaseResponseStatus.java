@@ -14,7 +14,11 @@ public enum BaseResponseStatus {
     NON_EXIST_USER(false, HttpStatus.NOT_FOUND.value(), "존재하지 않는 회원입니다"),
     WRONG_PASSWORD(false, HttpStatus.BAD_REQUEST.value(), "비밀번호가 일치하지 않습니다."),
     WRONG_REQUEST_BODY(false, HttpStatus.BAD_REQUEST.value(), "입력 형식이 알맞지 않습니다."),
-    EXIST_NICKNAME(false, HttpStatus.CONFLICT.value(), "이미 존재하는 닉네임입니다."),
+    EXIST_NICKNAME(false, HttpStatus.UNAUTHORIZED.value(), "이미 존재하는 닉네임입니다."),
+    INVALID_TOKEN(false, HttpStatus.UNAUTHORIZED.value(),"Invalid JWT Token"),
+    EXPRIED_TOKEN(false, HttpStatus.UNAUTHORIZED.value(), "Expired JWT Token"),
+    UNSURPPORTED_TOKEN(false, HttpStatus.UNAUTHORIZED.value(),"Unsupported JWT Token"),
+    EMPTY_TOKEN_CLAIM(false, HttpStatus.UNAUTHORIZED.value(),"JWT claims string is empty."),
 
 
     /** server error - 5xx */
