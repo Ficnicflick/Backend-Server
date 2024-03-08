@@ -100,8 +100,6 @@ public class KakaoPayService {
             throw new BaseException(BaseResponseStatus.DATABASE_INSERT_ERROR);
         }
 
-        payRepository.save(pay);
-
         return kakaoApproveResponse;
     }
 
