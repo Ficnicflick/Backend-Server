@@ -40,7 +40,8 @@ public class SecurityConfig {
     public WebSecurityCustomizer webSecurityCustomizer() {
         return web -> {
             web.ignoring()
-                    .requestMatchers("/signup", "/login");
+                    .requestMatchers("/v1/payment/**")
+                    .requestMatchers("/payment/**");
         };
     }
 
