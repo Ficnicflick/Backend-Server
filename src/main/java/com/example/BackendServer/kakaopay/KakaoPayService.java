@@ -102,6 +102,8 @@ public class KakaoPayService {
                 .item_name(kakaoApproveResponse.getItem_name())
                 .quantity(kakaoApproveResponse.getQuantity())
                 .total(kakaoApproveResponse.getAmount().getTotal())
+                .rent(0)
+                .deposit(0)     // 대여한 순간은 환불된 금액이 없으므로 0
                 .build();
 
         try {
@@ -118,33 +120,65 @@ public class KakaoPayService {
      * 결제 환불
      * 지정한 금액만큼 환불
      */
-    public KakaoCancelResponse kakaoCancel() {
+    public KakaoCancelResponse kakaoCancel(RefundDto refundDto) throws BaseException {
         // 카카오페이 요청
         /**
-         * todo
-         * 취소 금액을 pathVariable로 받아서 parameters.add("cancel_amount", amount); 로 받아서 취소
+         * todo: refundDto 받음
+         * refundDto: String tid, int cancel_amount
          */
+
+        Optional<Pay> optional = payRepository.findByTid(refundDto.getTid());
+        if (optional.isEmpty()) {
+            throw new BaseException(BaseResponseStatus.NON_EXIST_PAYMENT);
+        }
+
+        Pay requestPay = optional.get();
+        if (requestPay.getTotal() < refundDto.getCancel_amount()) {
+            throw new BaseException(BaseResponseStatus.WRONG_CANCEL_PAYMENT);
+        }
+
+
         MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
         parameters.add("cid", cid);
-        parameters.add("tid", "T1234567890123456789");     // 결제 고유 번호
-        parameters.add("cancel_amount", "1000");        // 환불, 취소 금액
+        parameters.add("tid", requestPay.getTid());     // 결제 고유 번호
+        parameters.add("cancel_amount",String.valueOf(refundDto.getCancel_amount()));        // 환불, 취소 금액
         parameters.add("cancel_tax_free_amount", "0");  // 취소 비과세 금액
 
         HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(parameters, this.getHeaders());
 
+        // 외부에 보낼 url
         RestTemplate restTemplate = new RestTemplate();
 
-        KakaoCancelResponse kakaoCancelResponse = restTemplate.postForObject(
-                "https://kapi.kakao.com/v1/payment/cancel",
-                requestEntity,
-                KakaoCancelResponse.class
-        );
+        KakaoCancelResponse kakaoCancelResponse = null;
+        try {
+            kakaoCancelResponse = restTemplate.postForObject(
+                    "https://kapi.kakao.com/v1/payment/cancel",
+                    requestEntity,
+                    KakaoCancelResponse.class
+            );
+        } catch (RestClientException e) {
+            throw e;
+        }
+
+        // 변경 내역 db에 저장
+        try {
+            requestPay.setRent(requestPay.getTotal() - refundDto.getCancel_amount());
+            requestPay.setDeposit(refundDto.getCancel_amount());        // 취소 금액 == 환불 금액 == 보증금
+
+            payRepository.save(requestPay);
+        } catch (Exception e) {
+            throw new BaseException(BaseResponseStatus.DATABASE_INSERT_ERROR);
+        }
 
         return kakaoCancelResponse;
-
     }
 
 
+    /**
+     * 구 카카오페이 헤더
+     * admin_key
+     * @return
+     */
     private HttpHeaders getHeaders() {
         HttpHeaders headers = new HttpHeaders();
 

@@ -21,13 +21,19 @@ public class Pay extends BaseEntity {
     private int quantity;
 
     private int total;
+    
+    private int rent;       // 대여비 (총 결제 금액 - 취소금액)
+    
+    private int deposit;        // 환불 금액 (보증금)
 
     @Builder
-    public Pay(String tid, String item_name, int quantity, int total) {
+    public Pay(String tid, String item_name, int quantity, int total, int rent, int deposit) {
         this.tid = tid;
         this.item_name = item_name;
         this.quantity = quantity;
         this.total = total;
+        this.rent = rent;
+        this.deposit = deposit;
     }
 
     // todo: user와 연결

@@ -52,11 +52,12 @@ public class KakaoPayController {
 
     /**
      * 환불
-     * todo: @PathVariable("amount") String amount
+     * todo: @PathVariable("amount") String amount -> X
+     * requestbody
      */
     @PostMapping("/refund")
-    public ResponseEntity<KakaoCancelResponse> refund() {
-        KakaoCancelResponse kakaoCancelResponse = kakaoPayService.kakaoCancel();
+    public ResponseEntity<KakaoCancelResponse> refund(@RequestBody RefundDto refundDto) {
+        KakaoCancelResponse kakaoCancelResponse = kakaoPayService.kakaoCancel(refundDto);
         return new ResponseEntity<>(kakaoCancelResponse, HttpStatus.OK);
     }
 }

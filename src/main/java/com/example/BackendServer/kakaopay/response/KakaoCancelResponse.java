@@ -24,7 +24,7 @@ public class KakaoCancelResponse {
     private CancelAvailableAmount cancel_available_amount;  // 남은 취소 가능 금액
     private String item_name;
     private String item_code;
-    private int quantity;
+    private int quantity;           // 상품 수량
     private String created_at;      // 결제 준비 요청 시각
     private String approved_at;     // 결제 승인 시각
     private String canceled_at;     // 결제 취소 시각
