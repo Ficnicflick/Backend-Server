@@ -1,8 +1,12 @@
 package com.example.BackendServer.kakaopay.dto;
 
 import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 @Getter
+@Setter
+@ToString
 public class Amount {
     private int total; // 총 결제 금액
     private int tax_free; // 비과세 금액

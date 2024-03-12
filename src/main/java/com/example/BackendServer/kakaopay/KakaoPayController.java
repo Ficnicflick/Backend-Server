@@ -1,9 +1,12 @@
 package com.example.BackendServer.kakaopay;
 
+import com.example.BackendServer.kakaopay.request.PayInfoDto;
+import com.example.BackendServer.kakaopay.request.RefundDto;
 import com.example.BackendServer.kakaopay.response.KakaoApproveResponse;
 import com.example.BackendServer.kakaopay.response.KakaoCancelResponse;
 import com.example.BackendServer.kakaopay.response.KakaoReadyResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,15 +14,16 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/payment")
 @RequiredArgsConstructor
+@Slf4j
 public class KakaoPayController {
     private final KakaoPayService kakaoPayService;
 
-    /**\
+    /**
      * 결제 요청
      */
     @PostMapping("/ready")
-    public ResponseEntity<KakaoReadyResponse> readyToKakaoPay() {
-        KakaoReadyResponse kakaoReadyResponse = kakaoPayService.kakaoPayReady();
+    public ResponseEntity<KakaoReadyResponse> readyToKakaoPay(@RequestBody PayInfoDto payInfoDto) {
+        KakaoReadyResponse kakaoReadyResponse = kakaoPayService.kakaoPayReady(payInfoDto);
         return ResponseEntity.ok(kakaoReadyResponse);
     }
 
