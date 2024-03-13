@@ -23,15 +23,12 @@ public class RefreshToken implements Serializable {
     @Indexed
     private String refreshToken; // 권한 필드가 추후 필요하면 추가
 
-    private String isSocailLogin;
-
     private String isLougout;
 
-    public static RefreshToken of(String key, String refreshToken, String isSocailLogin, String isLougout){
+    public static RefreshToken of(String key, String refreshToken, String isLougout){
         return RefreshToken.builder()
                 .id(key)
                 .refreshToken(refreshToken)
-                .isSocailLogin(isSocailLogin)
                 .isLougout(isLougout)
                 .build();
     }

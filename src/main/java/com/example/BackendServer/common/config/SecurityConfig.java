@@ -1,6 +1,6 @@
 package com.example.BackendServer.common.config;
 
-import com.example.BackendServer.common.auth.filter.JwtAuthenticationFilter;
+import com.example.BackendServer.fliter.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,8 +22,6 @@ import org.springframework.web.filter.CorsFilter;
 public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-
-
     // todo
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
@@ -35,7 +33,7 @@ public class SecurityConfig {
                 .formLogin(form -> form.disable())
                 .httpBasic(httpBasic -> httpBasic.disable())
                 .addFilter(this.corsFilter())
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class) // 여기까지 jwt 관련 설정
                 .authorizeHttpRequests((authorizeRequests) ->
                         authorizeRequests
                                 .anyRequest().authenticated() // Role : USER 도 추가하면 좋아보임. 왜 hasRole로 하면 실패하는 지 확인 못함
@@ -48,8 +46,8 @@ public class SecurityConfig {
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         final String[] NON_AUTHENTICATED = {
-            "/swagger-ui/**", "/api-docs/**",
-                    "/api/v1/user/sign-up", "/api/v1/user/sign-in"
+            "/swagger-ui/**", "/api-docs/**", "/api/v1/user/ping",
+                    "/api/v1/user/sign-up", "/api/v1/user/sign-in", "/api/v1/login/**", "/api/v1/login/oauth2/code/kakao"
         };
         return web -> {
             web.ignoring()

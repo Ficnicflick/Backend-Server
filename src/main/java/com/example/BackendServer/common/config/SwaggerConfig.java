@@ -1,7 +1,6 @@
 package com.example.BackendServer.common.config;
 
 
-import com.example.BackendServer.common.auth.service.JwtTokenProvider;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.models.Components;

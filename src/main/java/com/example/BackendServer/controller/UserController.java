@@ -1,16 +1,10 @@
-package com.example.BackendServer.domain;
+package com.example.BackendServer.controller;
 
-import com.example.BackendServer.common.auth.dto.TokenInfoResponse;
+import com.example.BackendServer.dto.token.TokenInfoResponse;
 import com.example.BackendServer.common.response.BaseResponse;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import com.example.BackendServer.service.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.Value;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -20,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     private final UserService userService;
 
-    @PostMapping("/sign-up")
+    /*@PostMapping("/sign-up")
     @Operation(summary = "사용자 회원가입", description = "회원가입을 통해 새로운 사용자를 서비스에 저장한다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "성공",
@@ -41,7 +35,7 @@ public class UserController {
 
         return new BaseResponse(userService.signIn(dto));
     }
-
+*/
 
     @PostMapping("/token/reissue")
     public BaseResponse<TokenInfoResponse> userTokenReissue(@RequestHeader(name = "Authorization") String token/*, @RequestHeader(name = "isRefreshToken") String isRefreshToken*/){

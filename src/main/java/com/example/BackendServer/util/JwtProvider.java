@@ -1,6 +1,6 @@
-package com.example.BackendServer.common.auth.service;
+package com.example.BackendServer.util;
 
-import com.example.BackendServer.common.auth.dto.TokenInfoResponse;
+import com.example.BackendServer.dto.token.TokenInfoResponse;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -21,7 +21,7 @@ import java.util.Date;
 import java.util.stream.Collectors;
 
 @Component @Slf4j
-public class JwtTokenProvider {
+public class JwtProvider {
     private static final String AUTHORITIES_KEY = "auth";
     private static final String BEARER_TYPE = "Bearer ";
     private static final long ACCESS_TOKEN_EXPIRE_TIME = /*30 * 60*/15 * 1000L;              // 30분
@@ -29,7 +29,7 @@ public class JwtTokenProvider {
 
     private final Key key;
 
-    public JwtTokenProvider(@Value("${jwt.secret}") String secretKey) {
+    public JwtProvider(@Value("${jwt.secret}") String secretKey) {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }

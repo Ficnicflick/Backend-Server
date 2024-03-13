@@ -1,12 +1,10 @@
-package com.example.BackendServer.common.auth.filter;
+package com.example.BackendServer.fliter;
 
-import com.example.BackendServer.common.auth.service.JwtTokenProvider;
-import com.example.BackendServer.common.exception.BaseException;
+import com.example.BackendServer.util.JwtProvider;
 import com.example.BackendServer.common.response.BaseResponse;
 import com.example.BackendServer.common.response.BaseResponseStatus;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import jakarta.servlet.FilterChain;
@@ -15,12 +13,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -33,7 +29,7 @@ import static com.example.BackendServer.common.response.BaseResponseStatus.*;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final String AUTHORIZATION_HEADER = "Authorization";
     private final String BEARER_TYPE = "Bearer";
-    private final JwtTokenProvider jwtTokenProvider;
+    private final JwtProvider jwtTokenProvider;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -41,10 +37,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = resolveToken(request);
         log.info("token = {}", token);
         try {
-            // 2. validateToken 으로 토큰 유효성 검사
-            if (token != null && jwtTokenProvider.validateToken(token)) {
+            if (token != null && jwtTokenProvider.validateToken(token)) { // 2. validateToken 으로 토큰 유효성 검사
                 // 토큰이 유효할 경우 토큰에서 Authentication 객체를 가지고 와서 SecurityContext 에 저장
-                log.info("해당 토큰은 유효함");
                 Authentication authentication = jwtTokenProvider.getAuthentication(token);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
                 log.info("해당 토큰은 유효하므로 SecurityContext에 저장");

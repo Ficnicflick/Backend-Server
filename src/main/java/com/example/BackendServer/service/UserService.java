@@ -1,25 +1,17 @@
-package com.example.BackendServer.domain;
+package com.example.BackendServer.service;
 
-import com.example.BackendServer.common.auth.dto.TokenInfoResponse;
-import com.example.BackendServer.common.auth.service.JwtTokenProvider;
+import com.example.BackendServer.dto.token.TokenInfoResponse;
+import com.example.BackendServer.util.JwtProvider;
 import com.example.BackendServer.common.entity.RefreshToken;
-import com.example.BackendServer.common.exception.BaseException;
 import com.example.BackendServer.common.repository.RefreshTokenRepository;
+import com.example.BackendServer.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.Optional;
-
-import static com.example.BackendServer.common.response.BaseResponseStatus.*;
 
 @Service @Slf4j
 @RequiredArgsConstructor
@@ -27,10 +19,14 @@ import static com.example.BackendServer.common.response.BaseResponseStatus.*;
 public class UserService {
     private final UserRepository userRepository;
     private final RefreshTokenRepository refreshTokenRepository;
-    private final AuthenticationManagerBuilder authenticationManagerBuilder;
-    private final JwtTokenProvider jwtTokenProvider;
-    private final PasswordEncoder passwordEncoder;
-    @Transactional
+    //private final AuthenticationManagerBuilder authenticationManagerBuilder;
+    private final JwtProvider jwtTokenProvider;
+    //private final PasswordEncoder passwordEncoder;
+
+    /*@Transactional
+    public String signUp()*/
+
+    /*@Transactional
     public String signUp(UserSignUpRequestDto dto){
 
         if(checkPassword(dto.getPassword(), dto.getCheckedPassword())){
@@ -87,7 +83,7 @@ public class UserService {
 
 
     }
-
+*/
     @Transactional
     public TokenInfoResponse reissue(String refreshToken) {
         Optional<RefreshToken> findRefreshToken = refreshTokenRepository.findByRefreshToken(refreshToken);

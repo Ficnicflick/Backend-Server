@@ -17,7 +17,7 @@ public class CustomExceptionHandler {
 
         return new BaseResponse<>(ex.getStatus());
     }
-    @ExceptionHandler(value = MethodArgumentNotValidException.class)
+    @ExceptionHandler(value = MethodArgumentNotValidException.class) // @Valid 관련 Exception 처리
     public BaseResponse<List> handleBaseException(MethodArgumentNotValidException ex){
         BaseResponse<List> response = new BaseResponse<>(BaseResponseStatus.WRONG_REQUEST_BODY);
         List<String> messages = ex.getBindingResult().getFieldErrors().stream().map(error -> error.getDefaultMessage()).collect(Collectors.toList());

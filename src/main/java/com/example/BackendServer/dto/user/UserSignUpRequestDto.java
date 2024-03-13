@@ -1,4 +1,4 @@
-package com.example.BackendServer.domain;
+package com.example.BackendServer.dto.user;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
@@ -36,7 +36,7 @@ public class UserSignUpRequestDto {
     private String email;
 
 
-    @Builder
+    /*@Builder
     public User toEntity() {
         return User.builder()
                 .username(username)
@@ -45,5 +45,5 @@ public class UserSignUpRequestDto {
                 .email(email)
                 .roles(Collections.singletonList("USER"))
                 .build();
-    }
+    }*/
 }
