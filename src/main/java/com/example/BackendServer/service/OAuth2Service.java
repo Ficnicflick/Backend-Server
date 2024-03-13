@@ -1,5 +1,7 @@
 package com.example.BackendServer.service;
 
+import com.example.BackendServer.common.exception.BaseException;
+import com.example.BackendServer.common.response.BaseResponseStatus;
 import com.example.BackendServer.dto.token.TokenInfoResponse;
 import com.example.BackendServer.common.entity.RefreshToken;
 import com.example.BackendServer.common.repository.RefreshTokenRepository;
@@ -26,6 +28,8 @@ import reactor.core.publisher.Mono;
 
 import java.util.Optional;
 
+import static com.example.BackendServer.common.response.BaseResponseStatus.EXTERNAL_SERVER_ERROR;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -40,6 +44,7 @@ public class OAuth2Service {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final PasswordEncoder passwordEncoder;
 
+    @Transactional
     public TokenInfoResponse socialSignIn(String code){
         // TODO: 2024-03-13 : kakao 이외 소셜 로그인이 추가됐을 때, 리팩토링 필요( 소셜 로그인 메소드를 통합하거나 각 소셜마다 로그인 서비스 로직으로 변경
         OAuth2AccessToken token = getAccessToken(code, "kakao"); // 외부 API(카카오 토큰 불러오기)
@@ -50,6 +55,8 @@ public class OAuth2Service {
         // security를 사용해 Authentication 객체 생성 
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(profile.id, profile.id + "_" + Provider.KAKAO.getText());
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+
+        log.info("authentication.getName() = {}", authentication.getName());
         
         TokenInfoResponse tokenInfoResponse = jwtProvider.generateToken(authentication); // jwt 발급
         saveRefreshToken(authentication, tokenInfoResponse); // jwt refresh token 저장
@@ -64,20 +71,20 @@ public class OAuth2Service {
         refreshTokenRepository.save(refreshToken);
     }
 
-    @Transactional // 저장으로 인해 DB에 영향을 미침.
+    // 저장으로 인해 DB에 영향을 미침.
     public User hasPreviousLogin(KakaoProfile profile, Provider provider) {
         Optional<User> findUser = userRepository.findBySocialIdAndProvider(profile.id, provider);
 
         if(findUser.isEmpty()){ //회원 정보 저장하기
             User createdUser = User.toEntity(profile,provider);
-            userRepository.save(createdUser);
             createdUser.encodePassword(passwordEncoder);
+            userRepository.save(createdUser);
             findUser = Optional.of(createdUser);
         }
         return findUser.get();
     }
 
-    public OAuth2AccessToken getAccessToken(String code, String provider) {
+    public OAuth2AccessToken getAccessToken(String code, String provider) throws BaseException {
         OAuth2Request oAuthToken = oAuthRequestFactory.getOAuthToken(code, provider); // OAuth API 요청에 필요한 요청 url과 필요한 인자 담기
 
         Mono<OAuth2AccessToken> result = webClient.mutate().build() // WebClientConfig 설정에 이어 webclient로 외부 HTTP 요청 설정
@@ -88,7 +95,10 @@ public class OAuth2Service {
                 .retrieve()
                 .bodyToMono(OAuth2AccessToken.class);
 
-        OAuth2AccessToken block = result.block(); // 동기 처리
+        OAuth2AccessToken block = result.block();// 동기 처리
+        if(block == null){
+            throw new BaseException(EXTERNAL_SERVER_ERROR);
+        }
         return block;
     }
 
@@ -105,6 +115,9 @@ public class OAuth2Service {
                 .bodyToMono(KakaoProfile.class);
         KakaoProfile block = result.block();
         log.info("사용자 정보 불러오기 서비스 무사히 종료");
+        if(block == null){
+            throw new BaseException(EXTERNAL_SERVER_ERROR);
+        }
 
         return block;
 
