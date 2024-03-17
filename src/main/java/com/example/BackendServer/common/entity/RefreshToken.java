@@ -14,7 +14,7 @@ import java.io.Serializable;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@RedisHash(value = "jwtToken", timeToLive = /*60 * 60 * 24 * 7*/ 30)
+@RedisHash(value = "jwtToken", timeToLive = 60 * 60 * 24 * 7 /*30*/)
 public class RefreshToken implements Serializable {
 
     @Id

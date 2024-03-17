@@ -24,7 +24,7 @@ public class OAuthRequestFactory {
             map.add("client_secret", kakaoInfo.getClientSecret()); // 카카오 Dev 카카오 로그인 Client Secret
 
 
-            return new OAuth2Request("https://kauth.kakao.com/oauth/token",map);
+            return new OAuth2Request(kakaoInfo.getTokenUrl(),map);
         }
 
        /* else if(provider.equals("google")){
