@@ -116,7 +116,7 @@ public class UserService {
     @Transactional
     public void logout(String token) {
         if(!jwtProvider.validateToken(resolveToken(token))){ // 변조된 refresh Token
-            throw new BaseException(UNSURPPORTED_TOKEN);
+            throw new BaseException(INVALID_TOKEN);
         }
         RefreshToken refreshToken = jwtProvider.changeToBlackToken(token);// 저장된 refreshToken 블랙토큰으로 변경
         refreshTokenRepository.save(refreshToken); //  CrudRepository를 상속해서 diry checking이 안됨. save()로 변경 적용
@@ -126,7 +126,6 @@ public class UserService {
         if (StringUtils.hasText(token) && token.startsWith("Bearer ")) {
             return token.substring(7);
         }
-        log.info("이상한 토큰값...?");
-        return null;
+        throw new BaseException(UNSURPPORTED_TOKEN);
     }
 }
