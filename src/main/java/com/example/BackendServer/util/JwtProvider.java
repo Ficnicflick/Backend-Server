@@ -1,5 +1,9 @@
 package com.example.BackendServer.util;
 
+import com.example.BackendServer.common.entity.RefreshToken;
+import com.example.BackendServer.common.exception.BaseException;
+import com.example.BackendServer.common.repository.RefreshTokenRepository;
+import com.example.BackendServer.common.response.BaseResponseStatus;
 import com.example.BackendServer.dto.token.TokenInfoResponse;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
@@ -18,20 +22,25 @@ import java.security.Key;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static com.example.BackendServer.common.response.BaseResponseStatus.*;
 
 @Component @Slf4j
 public class JwtProvider {
     private static final String AUTHORITIES_KEY = "auth";
     private static final String BEARER_TYPE = "Bearer ";
-    private static final long ACCESS_TOKEN_EXPIRE_TIME = /*30 * 60*/15 * 1000L;              // 30분
-    private static final long REFRESH_TOKEN_EXPIRE_TIME = /*7 * 24 * 60 * 60*/ 30 * 1000L;    // 7일
+    private static final long ACCESS_TOKEN_EXPIRE_TIME = 30 * 6015 * 1000L;              // 30분
+    private static final long REFRESH_TOKEN_EXPIRE_TIME = 7 * 24 * 60 * 60* 1000L;    // 7일
 
     private final Key key;
+    private final RefreshTokenRepository refreshTokenRepository;
 
-    public JwtProvider(@Value("${jwt.secret}") String secretKey) {
+    public JwtProvider(@Value("${jwt.secret}") String secretKey, RefreshTokenRepository refreshTokenRepository) {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         this.key = Keys.hmacShaKeyFor(keyBytes);
+        this.refreshTokenRepository = refreshTokenRepository;
     }
 
     // 유저 정보를 가지고 AccessToken, RefreshToken 을 생성하는 메서드
@@ -140,5 +149,10 @@ public class JwtProvider {
     }
 
 
+    public RefreshToken changeToBlackToken(String token) {
+        RefreshToken refreshToken = refreshTokenRepository.findByRefreshToken(token).orElseThrow(() -> new BaseException(NOT_EXIST_REFRESHTOKEN));
+        refreshToken.updateLogoutStatus(refreshToken);
 
+        return  refreshToken;
+    }
 }

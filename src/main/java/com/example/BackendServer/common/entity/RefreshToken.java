@@ -32,4 +32,8 @@ public class RefreshToken implements Serializable {
                 .isLougout(isLougout)
                 .build();
     }
+    public RefreshToken updateLogoutStatus(RefreshToken refreshToken){
+        refreshToken.isLougout = "true";
+        return refreshToken;
+    }
 }
