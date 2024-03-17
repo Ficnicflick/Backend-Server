@@ -93,11 +93,14 @@ public class UserService {
 */
     @Transactional
     public TokenInfoResponse reissue(String refreshToken) {
-        Optional<RefreshToken> findRefreshToken = refreshTokenRepository.findByRefreshToken(refreshToken);
+        RefreshToken findRefreshToken = refreshTokenRepository.findByRefreshToken(refreshToken).orElseThrow(
+                () -> new BaseException(NOT_EXIST_REFRESHTOKEN));
+        if(findRefreshToken.getIsLougout() == "true"){ // 이미 로그아웃으로 인해 블랙 토큰이므로 재발급 X
+            throw new BaseException(BLACK_TOKNE_REFRESHTOKEN);
+        }
 
         // 존재하지 않는 경우는 없음. 애초에 만료되어 사라진 토큰이라면 JwtAuthenticationFliter 단에서 미리 처리해버림.
-        RefreshToken result = findRefreshToken.get();
-        String token = result.getRefreshToken().substring(7);
+        String token = findRefreshToken.getRefreshToken().substring(7);
         String subject = jwtProvider.extractSubject(token);
         String auth = jwtProvider.extractAuth(token);
         long now = (new Date()).getTime();

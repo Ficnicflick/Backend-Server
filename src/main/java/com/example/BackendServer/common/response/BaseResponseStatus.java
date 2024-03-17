@@ -20,6 +20,7 @@ public enum BaseResponseStatus {
     UNSURPPORTED_TOKEN(false, HttpStatus.UNAUTHORIZED.value(),"Unsupported JWT Token"),
     EMPTY_TOKEN_CLAIM(false, HttpStatus.UNAUTHORIZED.value(),"JWT claims string is empty."),
     NOT_EXIST_REFRESHTOKEN(false, HttpStatus.NOT_FOUND.value(), "저장된 refreshToken이 존재하지 않습니다."),
+    BLACK_TOKNE_REFRESHTOKEN(false, HttpStatus.UNAUTHORIZED.value(), "해당 토큰은 블랙 토큰입니다."),
 
 
     /** server error - 5xx */
