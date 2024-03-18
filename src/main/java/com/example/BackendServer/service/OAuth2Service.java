@@ -1,7 +1,6 @@
 package com.example.BackendServer.service;
 
 import com.example.BackendServer.common.exception.BaseException;
-import com.example.BackendServer.common.response.BaseResponseStatus;
 import com.example.BackendServer.dto.token.TokenInfoResponse;
 import com.example.BackendServer.common.entity.RefreshToken;
 import com.example.BackendServer.common.repository.RefreshTokenRepository;
@@ -71,6 +70,8 @@ public class OAuth2Service {
         String rft = tokenInfoResponse.getRefreshToken(); // refreshToken 저장
         RefreshToken refreshToken  = RefreshToken.of(authentication.getName(), rft, "false");
         refreshTokenRepository.save(refreshToken);
+        Iterable<RefreshToken> all = refreshTokenRepository.findAll();
+        all.forEach( r -> log.info("r.getRefreshToken() = {}", r.getRefreshToken()));
     }
 
     // 저장으로 인해 DB에 영향을 미침.

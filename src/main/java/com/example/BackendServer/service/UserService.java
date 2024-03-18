@@ -1,14 +1,10 @@
 package com.example.BackendServer.service;
 
 import com.example.BackendServer.common.exception.BaseException;
-import com.example.BackendServer.common.response.BaseResponseStatus;
 import com.example.BackendServer.dto.token.TokenInfoResponse;
-import com.example.BackendServer.fliter.JwtAuthenticationFilter;
 import com.example.BackendServer.util.JwtProvider;
 import com.example.BackendServer.common.entity.RefreshToken;
 import com.example.BackendServer.common.repository.RefreshTokenRepository;
-import com.example.BackendServer.repository.UserRepository;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -16,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.Date;
-import java.util.Optional;
 
 import static com.example.BackendServer.common.response.BaseResponseStatus.*;
 
@@ -24,78 +19,16 @@ import static com.example.BackendServer.common.response.BaseResponseStatus.*;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class UserService {
-    private final UserRepository userRepository;
+
     private final RefreshTokenRepository refreshTokenRepository;
-    //private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final JwtProvider jwtProvider;
-    //private final PasswordEncoder passwordEncoder;
 
-    /*@Transactional
-    public String signUp()*/
-
-    /*@Transactional
-    public String signUp(UserSignUpRequestDto dto){
-
-        if(checkPassword(dto.getPassword(), dto.getCheckedPassword())){
-           throw new BaseException(WRONG_PASSWORD);
-        }
-        if(checkDuplicateUsername(dto.getUsername())){
-            throw new BaseException(EXIST_USER);
-        }
-        if(checkDuplicateNickname(dto.getNickname())){
-            throw new BaseException(EXIST_NICKNAME);
-        }
-
-        User user = dto.toEntity();
-        user.encodePassword(passwordEncoder);
-        userRepository.save(user);
-
-        return "sign-up success";
-    }
-
-    private boolean checkDuplicateNickname(String nickname) {
-        return userRepository.findByNickname(nickname).isPresent();
-    }
-
-    private boolean checkDuplicateUsername(String username) {
-        return userRepository.findByUsername(username).isPresent();
-    }
-
-    private static boolean checkPassword(String password, String checkedPassword ) {
-        return !password.equals(checkedPassword);
-    }
-
-    @Transactional
-    public TokenInfoResponse signIn(UserSignInRequestDto dto){
-        try {
-            log.info("로그인 서비스 로직 시작");
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(dto.getUsername(), dto.getPassword());
-            log.info("UsernamePasswordAuthenticationToken = {}", authenticationToken);
-            Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-            log.info("authentication = {}", authentication);
-
-            TokenInfoResponse response = jwtTokenProvider.generateToken(authentication);
-            
-            String refreshToken = response.getRefreshToken(); // refreshToken 저장
-            RefreshToken token = RefreshToken.of(authentication.getName(), refreshToken, "false", "false");
-            refreshTokenRepository.save(token);
-
-            return response;
-
-        }catch (UsernameNotFoundException ex){
-            throw new BaseException(NON_EXIST_USER);
-        }catch (BadCredentialsException ex){
-            throw new BaseException(WRONG_PASSWORD);
-        }
-
-
-    }
-*/
     @Transactional
     public TokenInfoResponse reissue(String refreshToken) {
         RefreshToken findRefreshToken = refreshTokenRepository.findByRefreshToken(refreshToken).orElseThrow(
                 () -> new BaseException(NOT_EXIST_REFRESHTOKEN));
-        if(findRefreshToken.getIsLougout() == "true"){ // 이미 로그아웃으로 인해 블랙 토큰이므로 재발급 X
+
+        if(findRefreshToken.getIsLougout().equals("true")){ // 이미 로그아웃으로 인해 블랙 토큰이므로 재발급 X
             throw new BaseException(BLACK_TOKNE_REFRESHTOKEN);
         }
 

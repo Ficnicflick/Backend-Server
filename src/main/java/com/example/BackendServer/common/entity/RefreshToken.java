@@ -14,7 +14,7 @@ import java.io.Serializable;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@RedisHash(value = "jwtToken", timeToLive = 60 * 60 * 24 * 7 /*30*/)
+@RedisHash(value = "jwtToken", timeToLive = 24 * 7 * 60 * 60)
 public class RefreshToken implements Serializable {
 
     @Id
@@ -23,6 +23,7 @@ public class RefreshToken implements Serializable {
     @Indexed
     private String refreshToken; // 권한 필드가 추후 필요하면 추가
 
+    @Indexed
     private String isLougout;
 
     public static RefreshToken of(String key, String refreshToken, String isLougout){
@@ -36,4 +37,5 @@ public class RefreshToken implements Serializable {
         refreshToken.isLougout = "true";
         return refreshToken;
     }
+
 }

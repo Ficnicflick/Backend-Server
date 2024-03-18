@@ -25,7 +25,7 @@ public enum BaseResponseStatus {
 
     /** server error - 5xx */
     DATABASE_INSERT_ERROR(false, HttpStatus.INTERNAL_SERVER_ERROR.value(), "데이터베이스 저장에 실패하였습니다."),
-    EXTERNAL_SERVER_ERROR(false, HttpStatus.INTERNAL_SERVER_ERROR.value(), "외부 API 호출을 실패했습니다.")
+    EXTERNAL_SERVER_ERROR(false, HttpStatus.SERVICE_UNAVAILABLE.value(), "외부 API 호출을 실패했습니다.")
 
     ;
 
