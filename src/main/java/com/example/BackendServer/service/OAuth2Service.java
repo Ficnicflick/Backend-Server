@@ -1,7 +1,6 @@
 package com.example.BackendServer.service;
 
 import com.example.BackendServer.common.exception.BaseException;
-import com.example.BackendServer.common.response.BaseResponseStatus;
 import com.example.BackendServer.dto.token.TokenInfoResponse;
 import com.example.BackendServer.common.entity.RefreshToken;
 import com.example.BackendServer.common.repository.RefreshTokenRepository;
@@ -47,7 +46,9 @@ public class OAuth2Service {
     @Transactional
     public TokenInfoResponse socialSignIn(String code){
         // TODO: 2024-03-13 : kakao 이외 소셜 로그인이 추가됐을 때, 리팩토링 필요( 소셜 로그인 메소드를 통합하거나 각 소셜마다 로그인 서비스 로직으로 변경
+        log.info("카카오 토큰 API");
         OAuth2AccessToken token = getAccessToken(code, "kakao"); // 외부 API(카카오 토큰 불러오기)
+        log.info("카카오 사용자 정보 API");
         KakaoProfile profile = getProfile(token.getAccess_token(), "kakao"); // 외부 API(카카오 사용자 정보 가져오기)
 
         User user = hasPreviousLogin(profile, Provider.KAKAO); // 사용자 회원가입 or 로그인 처리
@@ -69,6 +70,8 @@ public class OAuth2Service {
         String rft = tokenInfoResponse.getRefreshToken(); // refreshToken 저장
         RefreshToken refreshToken  = RefreshToken.of(authentication.getName(), rft, "false");
         refreshTokenRepository.save(refreshToken);
+        Iterable<RefreshToken> all = refreshTokenRepository.findAll();
+        all.forEach( r -> log.info("r.getRefreshToken() = {}", r.getRefreshToken()));
     }
 
     // 저장으로 인해 DB에 영향을 미침.

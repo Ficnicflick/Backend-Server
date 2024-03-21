@@ -27,8 +27,8 @@ import static com.example.BackendServer.common.response.BaseResponseStatus.*;
 @Component @Slf4j
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-    private final String AUTHORIZATION_HEADER = "Authorization";
-    private final String BEARER_TYPE = "Bearer";
+    private static final String AUTHORIZATION_HEADER = "Authorization";
+    private static final String BEARER_TYPE = "Bearer";
     private final JwtProvider jwtTokenProvider;
 
     @Override
