@@ -3,6 +3,12 @@ package com.example.BackendServer.controller;
 import com.example.BackendServer.dto.token.TokenInfoResponse;
 import com.example.BackendServer.common.response.BaseResponse;
 import com.example.BackendServer.service.OAuth2Service;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -11,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
 @Slf4j
+@Tag(name = "OAuth Login", description = "OAuth Login API" )
 public class OAuthLoginController {
     private final OAuth2Service oAuth2Service;
 
@@ -25,13 +32,22 @@ public class OAuthLoginController {
      * 카카오 로그인 API 구성 : 카카오 토큰 발급 API + 카카오 사용자 정보 불러오기 API -> jwt 발급
      *
      */
-    @GetMapping("/login/oauth2/code/kakao") // 카카오 로그인 API
+
+    // http://localhost:3000/login/oauth2/callback/kakao
+    @PostMapping("/login/oauth2/code/kakao") // 카카오 로그인 API
+    @Operation(summary = "사용자 로그인/회원가입", description = "인가 코드를 통해 사용자 저장 / 토큰 발급 API")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공",
+                    content = {@Content( schema = @Schema(implementation = BaseResponse.class, description = "카카오 로그인 성공"))}
+            )}
+    )
     public BaseResponse<?> loginKakao(@RequestParam(value = "code",required = true) String code ){
 
         TokenInfoResponse tokenInfoResponse = oAuth2Service.socialSignIn(code);
 
         return new BaseResponse(tokenInfoResponse);
     }
+
 
 
 

@@ -3,6 +3,11 @@ package com.example.BackendServer.controller;
 import com.example.BackendServer.dto.token.TokenInfoResponse;
 import com.example.BackendServer.common.response.BaseResponse;
 import com.example.BackendServer.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -14,22 +19,13 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     private final UserService userService;
 
-    /*@PostMapping("/sign-up")
-    @Operation(summary = "사용자 회원가입", description = "회원가입을 통해 새로운 사용자를 서비스에 저장한다.")
+    @PostMapping("/logout")
+    @Operation(summary = "로그아웃", description = "로그아웃을 하면 해당 사용자와 매칭되는 refresh token은  순기능을 잃는다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "성공",
-            content = {@Content( schema = @Schema(implementation = BaseResponse.class, description = "sign-up success"))}
+                    content = {@Content( schema = @Schema(implementation = BaseResponse.class, description = "로그아웃 성공"))}
             )}
     )
-
-    @PostMapping("/sign-in")
-    @Operation(summary = "사용자 로그인", description = "아이디와 비밀번호를 통해 로그인합니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "성공",
-                    content = {@Content( schema = @Schema(implementation = BaseResponse.class, description = "sign-up success"))})
-    })
-*/
-    @PostMapping("/logout")
     public BaseResponse<?> userLogout(@RequestHeader("Refresh") String refreshToken){ // act(인증, 인가) / rft(로그아웃 표시를 위해 블랙리스트 저장)
 
         userService.logout(refreshToken);
@@ -38,12 +34,25 @@ public class UserController {
     }
 
     @PostMapping("/token/reissue")
-    public BaseResponse<TokenInfoResponse> userTokenReissue(@RequestHeader(name = "Authorization") String token/*, @RequestHeader(name = "isRefreshToken") String isRefreshToken*/){
+    @Operation(summary = "토큰 재발급", description = "refresh token으로 access token을 재발급한다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공",
+                    content = {@Content( schema = @Schema(implementation = BaseResponse.class, description = "로그아웃 성공"))}
+            )}
+    )
+    public BaseResponse<TokenInfoResponse> userTokenReissue(@RequestHeader(name = "Authorization") String token){
 
         return new BaseResponse(userService.reissue(token));
 
     }
+    
     @GetMapping("/ping")
+    @Operation(summary = "테스트 API", description = "JWT 없이 요청이 가능하다. 반환되면 서버가 정상적으로 실행 중 이다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공",
+                    content = {@Content( schema = @Schema(implementation = BaseResponse.class, description = "API 호출 테스트 성공"))}
+            )}
+    )
     private BaseResponse<?> ping(){
         System.out.println("good job");
         return new BaseResponse<>("성공");
