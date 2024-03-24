@@ -3,8 +3,7 @@ package com.example.BackendServer.util;
 import com.example.BackendServer.common.entity.RefreshToken;
 import com.example.BackendServer.common.exception.BaseException;
 import com.example.BackendServer.common.repository.RefreshTokenRepository;
-import com.example.BackendServer.common.response.BaseResponseStatus;
-import com.example.BackendServer.dto.token.TokenInfoResponse;
+import com.example.BackendServer.dto.oauth2.TokenInfoResponseDto;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -22,7 +21,6 @@ import java.security.Key;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.example.BackendServer.common.response.BaseResponseStatus.*;
@@ -44,7 +42,7 @@ public class JwtProvider {
     }
 
     // 유저 정보를 가지고 AccessToken, RefreshToken 을 생성하는 메서드
-    public TokenInfoResponse generateToken(Authentication authentication) {
+    public TokenInfoResponseDto generateToken(Authentication authentication) {
         // 권한 가져오기
         String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
@@ -55,7 +53,7 @@ public class JwtProvider {
         String refreshToken = generateRefreshToken(authentication.getName(), authorities, now); // Refresh Token 생성
 
 
-        return TokenInfoResponse.builder()
+        return TokenInfoResponseDto.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();

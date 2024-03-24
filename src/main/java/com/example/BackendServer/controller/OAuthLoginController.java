@@ -1,6 +1,7 @@
 package com.example.BackendServer.controller;
 
-import com.example.BackendServer.dto.token.TokenInfoResponse;
+import com.example.BackendServer.dto.oauth2.LoginResponseDto;
+import com.example.BackendServer.dto.oauth2.TokenInfoResponseDto;
 import com.example.BackendServer.common.response.BaseResponse;
 import com.example.BackendServer.service.OAuth2Service;
 import io.swagger.v3.oas.annotations.Operation;
@@ -43,9 +44,9 @@ public class OAuthLoginController {
     )
     public BaseResponse<?> loginKakao(@RequestParam(value = "code",required = true) String code ){
 
-        TokenInfoResponse tokenInfoResponse = oAuth2Service.socialSignIn(code);
+        LoginResponseDto loginResponseDto = oAuth2Service.socialSignIn(code);
 
-        return new BaseResponse(tokenInfoResponse);
+        return new BaseResponse(loginResponseDto);
     }
 
 

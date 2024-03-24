@@ -1,6 +1,6 @@
 package com.example.BackendServer.controller;
 
-import com.example.BackendServer.dto.token.TokenInfoResponse;
+import com.example.BackendServer.dto.oauth2.TokenInfoResponseDto;
 import com.example.BackendServer.common.response.BaseResponse;
 import com.example.BackendServer.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -40,7 +40,7 @@ public class UserController {
                     content = {@Content( schema = @Schema(implementation = BaseResponse.class, description = "로그아웃 성공"))}
             )}
     )
-    public BaseResponse<TokenInfoResponse> userTokenReissue(@RequestHeader(name = "Authorization") String token){
+    public BaseResponse<TokenInfoResponseDto> userTokenReissue(@RequestHeader(name = "Authorization") String token){
 
         return new BaseResponse(userService.reissue(token));
 

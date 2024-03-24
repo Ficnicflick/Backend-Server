@@ -1,7 +1,8 @@
 package com.example.BackendServer.service;
 
 import com.example.BackendServer.common.exception.BaseException;
-import com.example.BackendServer.dto.token.TokenInfoResponse;
+import com.example.BackendServer.dto.oauth2.LoginResponseDto;
+import com.example.BackendServer.dto.oauth2.TokenInfoResponseDto;
 import com.example.BackendServer.common.entity.RefreshToken;
 import com.example.BackendServer.common.repository.RefreshTokenRepository;
 import com.example.BackendServer.dto.KakaoProfile;
@@ -44,7 +45,7 @@ public class OAuth2Service {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public TokenInfoResponse socialSignIn(String code){
+    public LoginResponseDto socialSignIn(String code){
         // TODO: 2024-03-13 : kakao 이외 소셜 로그인이 추가됐을 때, 리팩토링 필요( 소셜 로그인 메소드를 통합하거나 각 소셜마다 로그인 서비스 로직으로 변경
         log.info("카카오 토큰 API");
         OAuth2AccessToken token = getAccessToken(code, "kakao"); // 외부 API(카카오 토큰 불러오기)
@@ -59,14 +60,17 @@ public class OAuth2Service {
 
         log.info("authentication.getName() = {}", authentication.getName());
         
-        TokenInfoResponse tokenInfoResponse = jwtProvider.generateToken(authentication); // jwt 발급
+        TokenInfoResponseDto tokenInfoResponse = jwtProvider.generateToken(authentication); // jwt 발급
         saveRefreshToken(authentication, tokenInfoResponse); // jwt refresh token 저장
 
-        return tokenInfoResponse;
+        return  LoginResponseDto.builder()
+                .name(user.getNickname())
+                .tokenInfoResponseDto(tokenInfoResponse)
+                .build();
 
     }
 
-    private void saveRefreshToken(Authentication authentication, TokenInfoResponse tokenInfoResponse) {
+    private void saveRefreshToken(Authentication authentication, TokenInfoResponseDto tokenInfoResponse) {
         String rft = tokenInfoResponse.getRefreshToken(); // refreshToken 저장
         RefreshToken refreshToken  = RefreshToken.of(authentication.getName(), rft, "false");
         refreshTokenRepository.save(refreshToken);

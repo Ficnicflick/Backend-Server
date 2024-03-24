@@ -1,7 +1,7 @@
 package com.example.BackendServer.service;
 
 import com.example.BackendServer.common.exception.BaseException;
-import com.example.BackendServer.dto.token.TokenInfoResponse;
+import com.example.BackendServer.dto.oauth2.TokenInfoResponseDto;
 import com.example.BackendServer.util.JwtProvider;
 import com.example.BackendServer.common.entity.RefreshToken;
 import com.example.BackendServer.common.repository.RefreshTokenRepository;
@@ -24,7 +24,7 @@ public class UserService {
     private final JwtProvider jwtProvider;
 
     @Transactional
-    public TokenInfoResponse reissue(String refreshToken) {
+    public TokenInfoResponseDto reissue(String refreshToken) {
         RefreshToken findRefreshToken = refreshTokenRepository.findByRefreshToken(refreshToken).orElseThrow(
                 () -> new BaseException(NOT_EXIST_REFRESHTOKEN));
 
@@ -39,7 +39,7 @@ public class UserService {
         long now = (new Date()).getTime();
         String createdAccessToken = jwtProvider.generateAccessToken(subject, auth, now);
 
-        return TokenInfoResponse.builder()
+        return TokenInfoResponseDto.builder()
                 .accessToken(createdAccessToken)
                 .build();
 
