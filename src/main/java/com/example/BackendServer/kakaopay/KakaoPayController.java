@@ -1,5 +1,7 @@
 package com.example.BackendServer.kakaopay;
 
+import com.example.BackendServer.common.response.BaseResponse;
+import com.example.BackendServer.common.response.BaseResponseStatus;
 import com.example.BackendServer.kakaopay.request.PayInfoDto;
 import com.example.BackendServer.kakaopay.request.RefundDto;
 import com.example.BackendServer.kakaopay.response.KakaoApproveResponse;
@@ -39,20 +41,19 @@ public class KakaoPayController {
     /**
      * 결제 진행 중 취소
      */
-    public void cancel() {
-
+    public BaseResponse<String> cancel() {
+        return new BaseResponse<>("결제가 취소되었습니다.");
     }
 
     /**
      * 결제 실패
      */
-    public void fail() {
-
+    public BaseResponse<String> fail() {
+        return new BaseResponse<>("결제에 실패하였습니다.");
     }
 
     /**
      * 환불
-     * todo: @PathVariable("amount") String amount -> X
      * requestbody
      */
     @PostMapping("/refund")

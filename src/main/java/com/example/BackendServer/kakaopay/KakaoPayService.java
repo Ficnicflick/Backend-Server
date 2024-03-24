@@ -34,6 +34,9 @@ public class KakaoPayService {
     @Value("${admin.key}")
     private String adminKey;
 
+    @Value("${server.url}")
+    private String serverUrl;
+
     private KakaoReadyResponse kakaoReadyResponse;
     private final PayRepository payRepository;
 
@@ -50,9 +53,9 @@ public class KakaoPayService {
         parameters.add("quantity", String.valueOf(payInfoDto.getQuantity()));
         parameters.add("total_amount", String.valueOf(payInfoDto.getTotal_amount()));
         parameters.add("tax_free_amount", "0");
-        parameters.add("approval_url", "http://localhost:8080/payment/success");
-        parameters.add("fail_url", "http://localhost:8080/payment/fail");
-        parameters.add("cancel_url", "http://localhost:8080/payment/cancel");
+        parameters.add("approval_url", serverUrl +"/payment/success");
+        parameters.add("fail_url", serverUrl + "/payment/fail");
+        parameters.add("cancel_url", serverUrl + "/payment/cancel");
 
 
         HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(parameters, this.getHeaders());
@@ -96,7 +99,6 @@ public class KakaoPayService {
                 KakaoApproveResponse.class
         );
 
-
         Pay pay = Pay.builder()
                 .tid(kakaoReadyResponse.getTid())
                 .item_name(kakaoApproveResponse.getItem_name())
@@ -115,7 +117,6 @@ public class KakaoPayService {
         return kakaoApproveResponse;
     }
 
-
     /**
      * 결제 환불
      * 지정한 금액만큼 환불
@@ -123,7 +124,6 @@ public class KakaoPayService {
     public KakaoCancelResponse kakaoCancel(RefundDto refundDto) throws BaseException {
         // 카카오페이 요청
         /**
-         * todo: refundDto 받음
          * refundDto: String tid, int cancel_amount
          */
 
