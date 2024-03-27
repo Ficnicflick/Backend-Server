@@ -5,6 +5,8 @@ import com.example.BackendServer.dto.oauth2.TokenInfoResponseDto;
 import com.example.BackendServer.common.response.BaseResponse;
 import com.example.BackendServer.service.OAuth2Service;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -37,12 +39,16 @@ public class OAuthLoginController {
     // http://localhost:3000/login/oauth2/callback/kakao
     @PostMapping("/login/oauth2/code/kakao") // 카카오 로그인 API
     @Operation(summary = "사용자 로그인/회원가입", description = "인가 코드를 통해 사용자 저장 / 토큰 발급 API")
+    @Parameters(value = {
+            @Parameter(name = "code", description = "카카오 인가 코드", required = true)
+    })
+
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "성공",
                     content = {@Content( schema = @Schema(implementation = BaseResponse.class, description = "카카오 로그인 성공"))}
             )}
     )
-    public BaseResponse<?> loginKakao(@RequestParam(value = "code",required = true) String code ){
+    public BaseResponse<LoginResponseDto> loginKakao(@RequestParam(value = "code",required = true) String code){
 
         LoginResponseDto loginResponseDto = oAuth2Service.socialSignIn(code);
 
