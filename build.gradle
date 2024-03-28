@@ -27,12 +27,14 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-//	implementation 'org.apache.httpcomponents:httpclient'
-	implementation 'org.apache.httpcomponents.client5:httpclient5:5.2.1'
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
+
+	implementation 'org.apache.httpcomponents.client5:httpclient5:5.2.1'	// restTemplate
+
+	implementation 'com.google.zxing:javase:3.4.1'		// qr
 
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
