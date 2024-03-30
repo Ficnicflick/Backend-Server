@@ -1,1 +1,1 @@
-# Ficnicflick Backend Server
+# Picnicflick Backend Server
