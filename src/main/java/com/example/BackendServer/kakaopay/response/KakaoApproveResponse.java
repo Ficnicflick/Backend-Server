@@ -4,6 +4,8 @@ import com.example.BackendServer.kakaopay.dto.Amount;
 import lombok.Getter;
 import lombok.ToString;
 
+import java.time.LocalDateTime;
+
 @Getter
 @ToString
 public class KakaoApproveResponse {
@@ -18,7 +20,7 @@ public class KakaoApproveResponse {
     private String item_name;           // 상품명
     private String item_code;           // 상품 코드
     private int quantity;               // 상품 수량
-    private String created_at;          // 결제 요청 시간
-    private String approved_at;         // 결제 승인 시간
+    private LocalDateTime created_at;          // 결제 요청 시간
+    private LocalDateTime approved_at;         // 결제 승인 시간
     private String payload;
 }

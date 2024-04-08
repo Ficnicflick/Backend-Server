@@ -1,13 +1,15 @@
-package com.example.BackendServer.kakaopay;
+package com.example.BackendServer.service;
 
 import com.example.BackendServer.common.exception.BaseException;
 import com.example.BackendServer.common.response.BaseResponseStatus;
+import com.example.BackendServer.entity.History;
 import com.example.BackendServer.entity.Pay;
 import com.example.BackendServer.kakaopay.request.PayInfoDto;
 import com.example.BackendServer.kakaopay.request.RefundDto;
 import com.example.BackendServer.kakaopay.response.KakaoApproveResponse;
 import com.example.BackendServer.kakaopay.response.KakaoCancelResponse;
 import com.example.BackendServer.kakaopay.response.KakaoReadyResponse;
+import com.example.BackendServer.repository.HistoryRepository;
 import com.example.BackendServer.repository.PayRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +41,9 @@ public class KakaoPayService {
 
     private KakaoReadyResponse kakaoReadyResponse;
     private final PayRepository payRepository;
+    private final HistoryRepository historyRepository;
 
+//    private String localUrl = "http://localhost:8080";
 
     /**
      * 결제 준비
@@ -108,8 +112,21 @@ public class KakaoPayService {
                 .deposit(0)     // 대여한 순간은 환불된 금액이 없으므로 0
                 .build();
 
+        /**
+         * 생성 시 반환 시간은 결제 승인 시간과 동일하게 설정함
+         * 추후에 대여 여부 확인할 때 started_time == returned_time이면 미반납
+         */
+        History history = History.builder()
+                .started_time(kakaoApproveResponse.getApproved_at())
+                .returned_time(kakaoApproveResponse.getApproved_at())       // 일단 생성되면 returnedTime은 대여 시간과 동일하게 설정
+                .cnt(kakaoApproveResponse.getQuantity())
+                .status(History.Status.NOT_RETURNED)      // 지금 대여했으니까 not return
+                .pay(pay)
+                .build();
+
         try {
             payRepository.save(pay);
+            historyRepository.save(history);
         } catch (Exception e) {
             throw new BaseException(BaseResponseStatus.DATABASE_INSERT_ERROR);
         }

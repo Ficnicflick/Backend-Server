@@ -35,6 +35,4 @@ public class Pay extends BaseEntity {
         this.rent = rent;
         this.deposit = deposit;
     }
-
-    // todo: user와 연결
 }
