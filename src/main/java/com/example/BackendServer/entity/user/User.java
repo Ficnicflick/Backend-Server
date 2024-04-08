@@ -1,6 +1,7 @@
 package com.example.BackendServer.entity.user;
 
 import com.example.BackendServer.dto.KakaoProfile;
+import com.example.BackendServer.entity.History;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -34,6 +35,12 @@ public class User implements UserDetails{
     @Column(nullable = false) // 닉네임도 소셜마다 변경 및 중복 가능성 존재
     private String nickname;
 
+    @Column(nullable = false)
+    private int warningCnt;
+
+    @Column(nullable = false)
+    private double echoRate;
+
     /*@Enumerated(EnumType.STRING)
     private Role role;*/
 
@@ -46,6 +53,16 @@ public class User implements UserDetails{
 
     @Column // 이메일도 소셜마다 변경 및 중복 가능성 존재
     private String email;
+
+    /**
+     * 일단 단방향 매핑
+     * user에서만 order 조회 가능
+     */
+    @OneToMany
+    @JoinColumn(name = "order_id")
+    private List<History> histories = new ArrayList<>();
+
+
     /*
     @Column // 핸드폰 번호 변경 가능. 여러 소셜 로그인으로 회원가입 한 경우에도 번호가 같을 수 있음.
     private String phoneNumber;
@@ -58,6 +75,8 @@ public class User implements UserDetails{
         this.nickname = profile.getProperties().nickname;
         this.email = profile.getKakao_account().email;
         this.roles = Collections.singletonList("ROLE_USER");
+        this.warningCnt = 0;
+        this.echoRate = 0.0;
         this.provider = provider;
     }
 
@@ -69,6 +88,8 @@ public class User implements UserDetails{
                 .provider(provider)
                 .nickname(profile.getProperties().nickname)
                 .email(profile.getKakao_account().email)
+                .warningCnt(0)
+                .echoRate(0.0)
                 .build();
     }
 

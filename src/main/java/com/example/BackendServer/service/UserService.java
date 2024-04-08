@@ -2,6 +2,11 @@ package com.example.BackendServer.service;
 
 import com.example.BackendServer.common.exception.BaseException;
 import com.example.BackendServer.dto.oauth2.TokenInfoResponseDto;
+import com.example.BackendServer.dto.user.UserHistory;
+import com.example.BackendServer.dto.user.UserInfoDto;
+import com.example.BackendServer.entity.History;
+import com.example.BackendServer.entity.user.User;
+import com.example.BackendServer.repository.UserRepository;
 import com.example.BackendServer.util.JwtProvider;
 import com.example.BackendServer.common.entity.RefreshToken;
 import com.example.BackendServer.common.repository.RefreshTokenRepository;
@@ -11,7 +16,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import java.util.Date;
+import java.security.Principal;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.example.BackendServer.common.response.BaseResponseStatus.*;
 
@@ -22,6 +29,7 @@ public class UserService {
 
     private final RefreshTokenRepository refreshTokenRepository;
     private final JwtProvider jwtProvider;
+    private final UserRepository userRepository;
 
     @Transactional
     public TokenInfoResponseDto reissue(String refreshToken) {
@@ -61,4 +69,51 @@ public class UserService {
         }
         throw new BaseException(UNSURPPORTED_TOKEN);
     }
+
+    // myPage
+    public UserInfoDto getUserInfo(Principal principal) throws BaseException {
+        Optional<User> optional = userRepository.findByEmail(principal.getName());
+
+        if (optional.isEmpty()) {
+            throw new BaseException(NON_EXIST_USER);
+        }
+
+        User user = optional.get();
+
+        /**
+         * todo: echoRate, warningCnt -> '반납하기' 누를 때 마다 업데이트
+         */
+
+        UserInfoDto userInfoDto = UserInfoDto.builder()
+                .name(user.getNickname())
+                .email(user.getEmail())
+                .warning_cnt(user.getWarningCnt())
+                .echoRate(user.getEchoRate())       // 반납 완료 / 전체 대여 횟수
+                .build();
+
+        return userInfoDto;
+    }
+
+    // history (이용내역)
+    public List<UserHistory> getUserHistory(Principal principal) throws BaseException {
+        Optional<User> optional = userRepository.findByEmail(principal.getName());
+
+        if (optional.isEmpty()) {
+            throw new BaseException(NON_EXIST_USER);
+        }
+
+        User user = optional.get();
+
+        List<History> historyEntityList = user.getHistories();
+        List<UserHistory> historyList = historyEntityList.stream()
+                .map(UserHistory::OrderEntityToHistoryRes)
+                .collect(Collectors.toList());
+
+        if (historyList.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return historyList;
+    }
+    
+    // history - detail (상세내역)
 }

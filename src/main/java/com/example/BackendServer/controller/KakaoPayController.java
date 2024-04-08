@@ -1,7 +1,7 @@
-package com.example.BackendServer.kakaopay;
+package com.example.BackendServer.controller;
 
 import com.example.BackendServer.common.response.BaseResponse;
-import com.example.BackendServer.common.response.BaseResponseStatus;
+import com.example.BackendServer.service.KakaoPayService;
 import com.example.BackendServer.kakaopay.request.PayInfoDto;
 import com.example.BackendServer.kakaopay.request.RefundDto;
 import com.example.BackendServer.kakaopay.response.KakaoApproveResponse;
