@@ -1,6 +1,7 @@
 package com.example.BackendServer.entity;
 
 import com.example.BackendServer.common.entity.BaseEntity;
+import com.example.BackendServer.entity.user.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -31,6 +32,10 @@ public class History extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Status status;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
     @OneToOne
     @JoinColumn(name = "pay_id")
     private Pay pay;
@@ -41,11 +46,16 @@ public class History extends BaseEntity {
     }
 
     @Builder
-    public History(LocalDateTime started_time, LocalDateTime returned_time, int cnt, Status status, Pay pay) {
+    public History(LocalDateTime started_time, LocalDateTime returned_time, int cnt, Status status, User user, Pay pay) {
         this.started_time = started_time;
         this.returned_time = returned_time;
         this.cnt = cnt;
         this.status = status;
+        this.user = user;
         this.pay = pay;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }

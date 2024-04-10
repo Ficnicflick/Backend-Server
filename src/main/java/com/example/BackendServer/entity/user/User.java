@@ -56,10 +56,9 @@ public class User implements UserDetails{
 
     /**
      * 일단 단방향 매핑
-     * user에서만 order 조회 가능
+     * user에서만 history 조회 가능
      */
-    @OneToMany
-    @JoinColumn(name = "order_id")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<History> histories = new ArrayList<>();
 
 
@@ -93,6 +92,10 @@ public class User implements UserDetails{
                 .build();
     }
 
+    public void addHistory(History history) {
+        this.histories.add(history);
+        history.setUser(this);
+    }
     public void encodePassword(PasswordEncoder passwordEncoder){
         this.temporaryPassword = passwordEncoder.encode(temporaryPassword);
     }

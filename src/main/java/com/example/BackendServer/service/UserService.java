@@ -2,7 +2,7 @@ package com.example.BackendServer.service;
 
 import com.example.BackendServer.common.exception.BaseException;
 import com.example.BackendServer.dto.oauth2.TokenInfoResponseDto;
-import com.example.BackendServer.dto.user.UserHistory;
+import com.example.BackendServer.dto.user.UserHistoryDto;
 import com.example.BackendServer.dto.user.UserInfoDto;
 import com.example.BackendServer.entity.History;
 import com.example.BackendServer.entity.user.User;
@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import java.security.Principal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -71,8 +70,8 @@ public class UserService {
     }
 
     // myPage
-    public UserInfoDto getUserInfo(Principal principal) throws BaseException {
-        Optional<User> optional = userRepository.findByEmail(principal.getName());
+    public UserInfoDto getUserInfo(String socialId) throws BaseException {
+        Optional<User> optional = userRepository.findBySocialId(socialId);
 
         if (optional.isEmpty()) {
             throw new BaseException(NON_EXIST_USER);
@@ -95,8 +94,8 @@ public class UserService {
     }
 
     // history (이용내역)
-    public List<UserHistory> getUserHistory(Principal principal) throws BaseException {
-        Optional<User> optional = userRepository.findByEmail(principal.getName());
+    public List<UserHistoryDto> getUserHistory(String socialId) throws BaseException {
+        Optional<User> optional = userRepository.findBySocialId(socialId);
 
         if (optional.isEmpty()) {
             throw new BaseException(NON_EXIST_USER);
@@ -105,8 +104,10 @@ public class UserService {
         User user = optional.get();
 
         List<History> historyEntityList = user.getHistories();
-        List<UserHistory> historyList = historyEntityList.stream()
-                .map(UserHistory::OrderEntityToHistoryRes)
+        log.info("history size = {}", historyEntityList.size());
+
+        List<UserHistoryDto> historyList = historyEntityList.stream()
+                .map(UserHistoryDto::HistoryEntityToHistoryRes)
                 .collect(Collectors.toList());
 
         if (historyList.isEmpty()) {

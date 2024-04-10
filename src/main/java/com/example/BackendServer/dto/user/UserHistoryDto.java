@@ -9,7 +9,7 @@ import java.time.LocalTime;
 
 @Getter
 @Builder
-public class UserHistory {
+public class UserHistoryDto {
     private LocalDateTime rentDay;
     private LocalTime startTime;
     private LocalTime returnTime;
@@ -18,9 +18,9 @@ public class UserHistory {
     private int price;
 
 
-    public UserHistory() { }
+    public UserHistoryDto() { }
 
-    public UserHistory(LocalDateTime rentDay, LocalTime startTime, LocalTime returnTime, int rentCnt, History.Status status, int price) {
+    public UserHistoryDto(LocalDateTime rentDay, LocalTime startTime, LocalTime returnTime, int rentCnt, History.Status status, int price) {
         this.rentDay = rentDay;
         this.startTime = startTime;
         this.returnTime = returnTime;
@@ -29,14 +29,14 @@ public class UserHistory {
         this.price = price;
     }
 
-    public static UserHistory OrderEntityToHistoryRes(History history) {
-        return new UserHistory(
+    public static UserHistoryDto HistoryEntityToHistoryRes(History history) {
+        return new UserHistoryDto(
                 history.getStarted_time(),
                 history.getStarted_time().toLocalTime(),
                 history.getReturned_time().toLocalTime(),
                 history.getCnt(),
                 history.getStatus(),
-                history.getPay().getRent()
+                history.getPay().getTotal()     // todo: rent? total?
         );
     }
 }

@@ -2,30 +2,18 @@ package com.example.BackendServer.controller;
 
 import com.example.BackendServer.common.CurrentUser;
 import com.example.BackendServer.common.exception.BaseException;
-import com.example.BackendServer.common.response.BaseResponseStatus;
 import com.example.BackendServer.dto.oauth2.TokenInfoResponseDto;
 import com.example.BackendServer.common.response.BaseResponse;
-import com.example.BackendServer.dto.user.UserHistory;
+import com.example.BackendServer.dto.user.UserHistoryDto;
 import com.example.BackendServer.dto.user.UserInfoDto;
-import com.example.BackendServer.entity.user.Provider;
-import com.example.BackendServer.entity.user.User;
 import com.example.BackendServer.repository.UserRepository;
 import com.example.BackendServer.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Primary;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -66,9 +54,9 @@ public class UserController {
 
     // 마이페이지
     @GetMapping("/mypage")
-    public BaseResponse<UserInfoDto> getUserInfo(Principal principal) {
+    public BaseResponse<UserInfoDto> getUserInfo(@CurrentUser String socialId) {
         try {
-            UserInfoDto userInfoDto = userService.getUserInfo(principal);
+            UserInfoDto userInfoDto = userService.getUserInfo(socialId);
             return new BaseResponse<>(userInfoDto);
         } catch (BaseException e) {
             return new BaseResponse<>(e.getStatus());
@@ -77,9 +65,9 @@ public class UserController {
 
     // 이용내역
     @GetMapping("/history")
-    public BaseResponse<List<UserHistory>> getUserHistory(Principal principal) {
+    public BaseResponse<List<UserHistoryDto>> getUserHistory(@CurrentUser String socialId) {
         try {
-            List<UserHistory> historyList = userService.getUserHistory(principal);
+            List<UserHistoryDto> historyList = userService.getUserHistory(socialId);
             return new BaseResponse<>(historyList);
         } catch (BaseException e) {
             return new BaseResponse<>(e.getStatus());
