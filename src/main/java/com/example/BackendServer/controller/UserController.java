@@ -55,12 +55,12 @@ public class UserController {
     @GetMapping("/ping")
     private BaseResponse<?> ping(@CurrentUser String socialId){
 
-        log.info("socialId = {}", socialId);
+        /*log.info("socialId = {}", socialId);
         User user = userRepository.findBySocialIdAndProvider(socialId, Provider.KAKAO)
-                .orElseThrow(() -> new BaseException(BaseResponseStatus.NON_EXIST_USER));
+                .orElseThrow(() -> new BaseException(BaseResponseStatus.NON_EXIST_USER));*/
 
         System.out.println("good job");
-        return new BaseResponse<>(user);
+        return new BaseResponse<>("ok");
     }
 
 
