@@ -1,5 +1,6 @@
 package com.example.BackendServer.controller;
 
+import com.example.BackendServer.common.CurrentUser;
 import com.example.BackendServer.common.response.BaseResponse;
 import com.example.BackendServer.service.KakaoPayService;
 import com.example.BackendServer.kakaopay.request.PayInfoDto;
@@ -24,17 +25,17 @@ public class KakaoPayController {
      * 결제 요청
      */
     @PostMapping("/ready")
-    public ResponseEntity<KakaoReadyResponse> readyToKakaoPay(@RequestBody PayInfoDto payInfoDto) {
-        KakaoReadyResponse kakaoReadyResponse = kakaoPayService.kakaoPayReady(payInfoDto);
+    public ResponseEntity<KakaoReadyResponse> readyToKakaoPay(@RequestBody PayInfoDto payInfoDto, @CurrentUser String socialId) {
+        KakaoReadyResponse kakaoReadyResponse = kakaoPayService.kakaoPayReady(payInfoDto, socialId);
         return ResponseEntity.ok(kakaoReadyResponse);
     }
 
     /**
      * 결제 승인
      */
-    @GetMapping("/success")
-    public ResponseEntity<KakaoApproveResponse> afterPayRequest(@RequestParam("pg_token") String pgToken) {
-        KakaoApproveResponse kakaoApproveResponse = kakaoPayService.ApproveResponse(pgToken);
+    @GetMapping("/success/{id}")
+    public ResponseEntity<KakaoApproveResponse> afterPayRequest(@PathVariable("id")String socialId, @RequestParam("pg_token") String pgToken) {
+        KakaoApproveResponse kakaoApproveResponse = kakaoPayService.ApproveResponse(pgToken, socialId);
         return ResponseEntity.ok(kakaoApproveResponse);
     }
 

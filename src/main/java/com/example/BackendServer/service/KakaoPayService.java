@@ -4,6 +4,7 @@ import com.example.BackendServer.common.exception.BaseException;
 import com.example.BackendServer.common.response.BaseResponseStatus;
 import com.example.BackendServer.entity.History;
 import com.example.BackendServer.entity.Pay;
+import com.example.BackendServer.entity.user.User;
 import com.example.BackendServer.kakaopay.request.PayInfoDto;
 import com.example.BackendServer.kakaopay.request.RefundDto;
 import com.example.BackendServer.kakaopay.response.KakaoApproveResponse;
@@ -11,6 +12,7 @@ import com.example.BackendServer.kakaopay.response.KakaoCancelResponse;
 import com.example.BackendServer.kakaopay.response.KakaoReadyResponse;
 import com.example.BackendServer.repository.HistoryRepository;
 import com.example.BackendServer.repository.PayRepository;
+import com.example.BackendServer.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,13 +44,20 @@ public class KakaoPayService {
     private KakaoReadyResponse kakaoReadyResponse;
     private final PayRepository payRepository;
     private final HistoryRepository historyRepository;
+    private final UserRepository userRepository;
 
-//    private String localUrl = "http://localhost:8080";
+    private String localUrl = "http://localhost:8080";
 
     /**
      * 결제 준비
      */
-    public KakaoReadyResponse kakaoPayReady(PayInfoDto payInfoDto) throws BaseException {
+    public KakaoReadyResponse kakaoPayReady(PayInfoDto payInfoDto, String socialId) throws BaseException {
+        Optional<User> optional = userRepository.findBySocialId(socialId);
+        if (optional.isEmpty()) {
+            throw new BaseException(BaseResponseStatus.NON_EXIST_USER);
+        }
+        User user = optional.get();
+
         MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
         parameters.add("cid", cid);
         parameters.add("partner_order_id", "가맹점 주문 번호");
@@ -57,9 +66,9 @@ public class KakaoPayService {
         parameters.add("quantity", String.valueOf(payInfoDto.getQuantity()));
         parameters.add("total_amount", String.valueOf(payInfoDto.getTotal_amount()));
         parameters.add("tax_free_amount", "0");
-        parameters.add("approval_url", serverUrl +"/payment/success");
-        parameters.add("fail_url", serverUrl + "/payment/fail");
-        parameters.add("cancel_url", serverUrl + "/payment/cancel");
+        parameters.add("approval_url", localUrl +"/payment/success" + "/" + socialId);      // user 식별 가능하게 하기 위해서
+        parameters.add("fail_url", localUrl + "/payment/fail");
+        parameters.add("cancel_url", localUrl + "/payment/cancel");
 
 
         HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(parameters, this.getHeaders());
@@ -83,7 +92,14 @@ public class KakaoPayService {
     /**
      * 결제 완료 승인
      */
-    public KakaoApproveResponse ApproveResponse(String pgToken) throws BaseException {
+    public KakaoApproveResponse ApproveResponse(String pgToken, String socialId) throws BaseException {
+        Optional<User> optional = userRepository.findBySocialId(socialId);
+
+        if (optional.isEmpty()) {
+            throw  new BaseException(BaseResponseStatus.NON_EXIST_USER);
+        }
+        User user = optional.get();
+
         // 카카오 요청
         MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
         parameters.add("cid", cid);
@@ -121,12 +137,14 @@ public class KakaoPayService {
                 .returned_time(kakaoApproveResponse.getApproved_at())       // 일단 생성되면 returnedTime은 대여 시간과 동일하게 설정
                 .cnt(kakaoApproveResponse.getQuantity())
                 .status(History.Status.NOT_RETURNED)      // 지금 대여했으니까 not return
+                .user(user)
                 .pay(pay)
                 .build();
 
         try {
             payRepository.save(pay);
             historyRepository.save(history);
+            user.addHistory(history);
         } catch (Exception e) {
             throw new BaseException(BaseResponseStatus.DATABASE_INSERT_ERROR);
         }
