@@ -46,9 +46,8 @@ public class SecurityConfig {
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         final String[] NON_AUTHENTICATED = {
-            "/swagger-ui/**", "/api-docs/**", "/api/v1/user/ping",
-                    "/api/v1/user/sign-up", "/api/v1/user/sign-in", "/api/v1/login/**", "/api/v1/login/oauth2/code/kakao",
-                "/v1/payment/**", "/payment/**"
+            "/swagger-ui/**", "/api-docs/**", "/api/v1/user/ping","/",
+                     "/api/v1/login/**", "/api/v1/login/oauth2/code/kakao", "/v1/payment/**", "/payment/**"
         };
         return web -> {
             web.ignoring()

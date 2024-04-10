@@ -65,6 +65,7 @@ public class OAuth2Service {
 
         return  LoginResponseDto.builder()
                 .name(user.getNickname())
+                .email(user.getEmail())
                 .tokenInfoResponseDto(tokenInfoResponse)
                 .build();
 

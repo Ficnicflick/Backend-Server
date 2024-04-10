@@ -17,9 +17,12 @@ public class LoginResponseDto {
     @Schema(description = "카카오 닉네임", example = "김승진")
     private String name;
 
+    private String email;
+
     @Builder
-    public LoginResponseDto(TokenInfoResponseDto tokenInfoResponseDto, String name) {
+    public LoginResponseDto(TokenInfoResponseDto tokenInfoResponseDto, String name, String email) {
         this.tokenInfoResponseDto = tokenInfoResponseDto;
         this.name = name;
+        this.email = email;
     }
 }

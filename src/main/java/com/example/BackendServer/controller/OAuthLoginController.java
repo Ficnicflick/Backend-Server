@@ -12,8 +12,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -38,18 +40,10 @@ public class OAuthLoginController {
 
     // http://localhost:3000/login/oauth2/callback/kakao
     @PostMapping("/login/oauth2/code/kakao") // 카카오 로그인 API
-    @Operation(summary = "사용자 로그인/회원가입", description = "인가 코드를 통해 사용자 저장 / 토큰 발급 API")
-    @Parameters(value = {
-            @Parameter(name = "code", description = "카카오 인가 코드", required = true)
-    })
+    public BaseResponse<LoginResponseDto> loginKakao(@RequestParam(value = "code",required = true) String code,
+                                                     HttpServletRequest request){
 
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "성공",
-                    content = {@Content( schema = @Schema(implementation = BaseResponse.class, description = "카카오 로그인 성공"))}
-            )}
-    )
-    public BaseResponse<LoginResponseDto> loginKakao(@RequestParam(value = "code",required = true) String code){
-
+        String remoteHost = request.getRemoteHost();
         LoginResponseDto loginResponseDto = oAuth2Service.socialSignIn(code);
 
         return new BaseResponse(loginResponseDto);
