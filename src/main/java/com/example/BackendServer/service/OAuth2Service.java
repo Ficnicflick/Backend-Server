@@ -47,9 +47,7 @@ public class OAuth2Service {
     @Transactional
     public LoginResponseDto socialSignIn(String code){
         // TODO: 2024-03-13 : kakao 이외 소셜 로그인이 추가됐을 때, 리팩토링 필요( 소셜 로그인 메소드를 통합하거나 각 소셜마다 로그인 서비스 로직으로 변경
-        log.info("카카오 토큰 API");
         OAuth2AccessToken token = getAccessToken(code, "kakao"); // 외부 API(카카오 토큰 불러오기)
-        log.info("카카오 사용자 정보 API");
         KakaoProfile profile = getProfile(token.getAccess_token(), "kakao"); // 외부 API(카카오 사용자 정보 가져오기)
 
         User user = hasPreviousLogin(profile, Provider.KAKAO); // 사용자 회원가입 or 로그인 처리
@@ -58,8 +56,6 @@ public class OAuth2Service {
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(profile.id, profile.id + "_" + Provider.KAKAO.getText());
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
 
-        log.info("authentication.getName() = {}", authentication.getName());
-        
         TokenInfoResponseDto tokenInfoResponse = jwtProvider.generateToken(authentication); // jwt 발급
         saveRefreshToken(authentication, tokenInfoResponse); // jwt refresh token 저장
 
