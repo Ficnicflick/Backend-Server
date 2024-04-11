@@ -13,6 +13,7 @@ public class UserHistoryDto {
     private LocalDateTime rentDay;
     private LocalTime startTime;
     private LocalTime returnTime;
+    private String location;
     private int rentCnt;
     private History.Status status;
     private int price;
@@ -20,10 +21,11 @@ public class UserHistoryDto {
 
     public UserHistoryDto() { }
 
-    public UserHistoryDto(LocalDateTime rentDay, LocalTime startTime, LocalTime returnTime, int rentCnt, History.Status status, int price) {
+    public UserHistoryDto(LocalDateTime rentDay, LocalTime startTime, LocalTime returnTime,String location, int rentCnt, History.Status status, int price) {
         this.rentDay = rentDay;
         this.startTime = startTime;
         this.returnTime = returnTime;
+        this.location = location;
         this.rentCnt = rentCnt;
         this.status = status;
         this.price = price;
@@ -34,6 +36,7 @@ public class UserHistoryDto {
                 history.getStarted_time(),
                 history.getStarted_time().toLocalTime(),
                 history.getReturned_time().toLocalTime(),
+                history.getMat().getPlace().getLocation(),
                 history.getCnt(),
                 history.getStatus(),
                 history.getPay().getTotal()     // todo: rent? total?
