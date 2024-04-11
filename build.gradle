@@ -52,10 +52,10 @@ dependencies {
 	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
 }
 
-tasks.named('bootBuildImage') {
+/*tasks.named('bootBuildImage') {
 	builder = 'paketobuildpacks/builder-jammy-base:latest'
-}
+}*/
 
-tasks.named('test') {
+test {
 	useJUnitPlatform()
 }

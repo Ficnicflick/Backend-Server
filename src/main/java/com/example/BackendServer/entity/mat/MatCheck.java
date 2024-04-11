@@ -22,4 +22,8 @@ public class MatCheck {
     public void changeMatStatus(MatStatus matStatus){
         this.matStatus = matStatus;
     }
+    public void changeMatCount(int useCount){
+        this.useCount = useCount;
+    }
+
 }

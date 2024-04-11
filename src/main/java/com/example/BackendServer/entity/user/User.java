@@ -59,6 +59,7 @@ public class User implements UserDetails{
      * user에서만 history 조회 가능
      */
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<History> histories = new ArrayList<>();
 
 
