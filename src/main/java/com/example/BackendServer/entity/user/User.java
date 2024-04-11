@@ -54,10 +54,7 @@ public class User implements UserDetails{
     @Column // 이메일도 소셜마다 변경 및 중복 가능성 존재
     private String email;
 
-    /**
-     * 일단 단방향 매핑
-     * user에서만 history 조회 가능
-     */
+    // 이용내역 list
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<History> histories = new ArrayList<>();
 
