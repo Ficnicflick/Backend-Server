@@ -3,8 +3,13 @@ package com.example.BackendServer.entity.mat;
 import com.example.BackendServer.common.entity.BaseEntity;
 import com.example.BackendServer.entity.History;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-@Entity
+@Entity @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Mat extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,10 +24,10 @@ public class Mat extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Place place;
 
-    @OneToOne
-    private History history;
-
-
-
-
+    @Builder
+    public Mat(int price, MatCheck matCheck, Place place) {
+        this.price = price;
+        this.matCheck = matCheck;
+        this.place = place;
+    }
 }
