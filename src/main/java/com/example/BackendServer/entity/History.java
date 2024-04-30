@@ -1,6 +1,7 @@
 package com.example.BackendServer.entity;
 
 import com.example.BackendServer.common.entity.BaseEntity;
+import com.example.BackendServer.entity.mat.Mat;
 import com.example.BackendServer.entity.user.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -9,6 +10,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+
+import static jakarta.persistence.FetchType.LAZY;
 
 @Entity
 @Getter
@@ -32,11 +35,15 @@ public class History extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Status status;
 
-    @ManyToOne
+    @OneToOne(fetch = LAZY)
+    @JoinColumn(name = "mat_id")
+    private Mat mat;
+
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @OneToOne
+    @OneToOne(fetch = LAZY)
     @JoinColumn(name = "pay_id")
     private Pay pay;
 
