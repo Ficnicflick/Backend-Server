@@ -1,5 +1,7 @@
 package com.example.BackendServer.entity.mat;
 
+import com.example.BackendServer.common.exception.BaseException;
+import com.example.BackendServer.common.response.BaseResponseStatus;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -16,10 +18,11 @@ public enum Place {
     private final double lantitude;
 
     public static Place getLocation(double logitude, double lantitude){
-        Place place1 = Arrays
-                .stream(Place.values()).filter(place -> place.getLogitude() == logitude && place.getLantitude() == lantitude)
-                .collect(Collectors.toList()).stream().findFirst().get();
 
-        return place1;
+        return Arrays
+                .stream(Place.values()).filter(place -> place.getLogitude() == logitude && place.getLantitude() == lantitude)
+                .collect(Collectors.toList()).stream().findFirst().orElseThrow(
+                        () -> new BaseException(BaseResponseStatus.NOT_EXIST_PLACE)
+                );
     }
 }

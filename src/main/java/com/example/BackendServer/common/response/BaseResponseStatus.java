@@ -15,6 +15,7 @@ public enum BaseResponseStatus {
     WRONG_PASSWORD(false, HttpStatus.BAD_REQUEST.value(), "비밀번호가 일치하지 않습니다."),
     WRONG_REQUEST_BODY(false, HttpStatus.BAD_REQUEST.value(), "입력 형식이 알맞지 않습니다."),
     EXIST_NICKNAME(false, HttpStatus.UNAUTHORIZED.value(), "이미 존재하는 닉네임입니다."),
+
     INVALID_TOKEN(false, HttpStatus.UNAUTHORIZED.value(),"Invalid JWT Token"),
     EXPRIED_TOKEN(false, HttpStatus.UNAUTHORIZED.value(), "Expired JWT Token"),
     UNSURPPORTED_TOKEN(false, HttpStatus.UNAUTHORIZED.value(),"Unsupported JWT Token"),
@@ -24,7 +25,11 @@ public enum BaseResponseStatus {
 
     NOT_EXIST_MAT(false, HttpStatus.NOT_FOUND.value(), "존재하지 않는 돗자리입니다."),
     NON_EXIST_PAYMENT(false, HttpStatus.NOT_FOUND.value(), "결제 내역이 존재하지 않습니다."),
+    NOT_EXIST_HISTORY(false, HttpStatus.NOT_FOUND.value(), "존재하지 않는 이용내역입니다."),
     WRONG_CANCEL_PAYMENT(false, HttpStatus.BAD_REQUEST.value(), "취소 금액이 올바르지 않습니다."),
+    NOT_EXIST_PLACE(false, HttpStatus.NOT_FOUND.value(), "존재하지 않는 위치(위도, 경도)입니다."),
+
+    USER_MISMATCH(false, HttpStatus.CONFLICT.value(), "같은 회원이 아닙니다."),
 
     /** server error - 5xx */
     DATABASE_INSERT_ERROR(false, HttpStatus.INTERNAL_SERVER_ERROR.value(), "데이터베이스 저장에 실패하였습니다."),
