@@ -4,6 +4,7 @@ import com.example.BackendServer.common.exception.BaseException;
 import com.example.BackendServer.dto.oauth2.TokenInfoResponseDto;
 import com.example.BackendServer.dto.user.UserHistoryDto;
 import com.example.BackendServer.dto.user.UserInfoDto;
+import com.example.BackendServer.dto.user.UserNicknameRequestDto;
 import com.example.BackendServer.entity.History;
 import com.example.BackendServer.entity.user.User;
 import com.example.BackendServer.repository.UserRepository;
@@ -18,6 +19,7 @@ import org.springframework.util.StringUtils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Period;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -95,5 +97,32 @@ public class UserService {
         return userInfoDto;
     }
 
+    // 회원 정보 수정
+    @Transactional
+    public void updateNickname(String socialId, String nickname) throws BaseException {
+        Optional<User> optional = userRepository.findBySocialId(socialId);
+        if (optional.isEmpty()) {
+            throw new BaseException(NON_EXIST_USER);
+        }
 
+        User user = optional.get();
+
+        LocalDate lastUpdate = user.getNicknameUpdateAt();
+        log.info("lastUpdate: {}", lastUpdate);
+        Period between = Period.between(LocalDate.now(), lastUpdate);
+        int amount = between.getDays();
+
+//         변경 기간 확인
+        if (amount < 7) {
+            throw new BaseException(LIMIT_NICKNAME_CHANGE);
+        }
+
+        try {
+            user.setNickname(nickname);
+            user.setNicknameUpdateAt(LocalDate.now());
+            userRepository.save(user);
+        } catch (Exception e) {
+            throw new BaseException(DATABASE_INSERT_ERROR);
+        }
+    }
 }

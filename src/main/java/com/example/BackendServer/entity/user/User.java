@@ -9,6 +9,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.LocalDate;
 import java.util.*;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
@@ -37,6 +38,9 @@ public class User implements UserDetails{
 
     @Column(nullable = false)
     private double echoRate;
+
+    @Column(nullable = false)
+    private LocalDate nicknameUpdateAt;
 
     /*@Enumerated(EnumType.STRING)
     private Role role;*/
@@ -70,6 +74,7 @@ public class User implements UserDetails{
         this.roles = Collections.singletonList("ROLE_USER");
         this.warningCnt = 0;
         this.echoRate = 0.0;
+        this.nicknameUpdateAt = LocalDate.now();
         this.provider = provider;
     }
 
@@ -83,6 +88,7 @@ public class User implements UserDetails{
                 .email(profile.getKakao_account().email)
                 .warningCnt(0)
                 .echoRate(0.0)
+                .nicknameUpdateAt(LocalDate.now())
                 .build();
     }
 
@@ -145,5 +151,13 @@ public class User implements UserDetails{
     @Override
     public int hashCode() {
         return Objects.hash(id, socialId, temporaryPassword, nickname, warningCnt, echoRate, provider, roles, email, histories);
+    }
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public void setNicknameUpdateAt(LocalDate nicknameUpdateAt) {
+        this.nicknameUpdateAt = nicknameUpdateAt;
     }
 }

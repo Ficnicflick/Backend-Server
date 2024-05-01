@@ -63,7 +63,7 @@ public class KakaoPayService {
         parameters.add("partner_order_id", "가맹점 주문 번호");
         parameters.add("partner_user_id", "가맹점 회원 ID");
         parameters.add("item_name", "PicnicFlick");
-        parameters.add("quantity", String.valueOf(payInfoDto.getQuantity()));
+        parameters.add("quantity", String.valueOf(payInfoDto.getQuantity()));       // todo: 돗자리 pk로 변경
         parameters.add("total_amount", String.valueOf(payInfoDto.getTotal_amount()));
         parameters.add("tax_free_amount", "0");
         parameters.add("approval_url", serverUrl +"/payment/success" + "/" + socialId);      // user 식별 가능하게 하기 위해서

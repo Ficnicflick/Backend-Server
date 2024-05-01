@@ -6,6 +6,7 @@ import com.example.BackendServer.dto.oauth2.TokenInfoResponseDto;
 import com.example.BackendServer.common.response.BaseResponse;
 import com.example.BackendServer.dto.user.UserHistoryDto;
 import com.example.BackendServer.dto.user.UserInfoDto;
+import com.example.BackendServer.dto.user.UserNicknameRequestDto;
 import com.example.BackendServer.repository.UserRepository;
 import com.example.BackendServer.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -63,4 +64,13 @@ public class UserController {
         }
     }
 
+    @PatchMapping("/update/nickname")
+    public BaseResponse<String> updateNickname(@CurrentUser String socialId, @RequestBody UserNicknameRequestDto userNicknameRequestDto) {
+        try {
+            userService.updateNickname(socialId, userNicknameRequestDto.getNickname());
+            return new BaseResponse<>("닉네임을 수정하였습니다");
+        } catch (BaseException e) {
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
 }

@@ -15,6 +15,7 @@ public enum BaseResponseStatus {
     WRONG_PASSWORD(false, HttpStatus.BAD_REQUEST.value(), "비밀번호가 일치하지 않습니다."),
     WRONG_REQUEST_BODY(false, HttpStatus.BAD_REQUEST.value(), "입력 형식이 알맞지 않습니다."),
     EXIST_NICKNAME(false, HttpStatus.UNAUTHORIZED.value(), "이미 존재하는 닉네임입니다."),
+    LIMIT_NICKNAME_CHANGE(false, HttpStatus.TOO_MANY_REQUESTS.value(), "마지막 닉네임 변경일로부터 7일이 경과하지 않았습니다."),
 
     INVALID_TOKEN(false, HttpStatus.UNAUTHORIZED.value(),"Invalid JWT Token"),
     EXPRIED_TOKEN(false, HttpStatus.UNAUTHORIZED.value(), "Expired JWT Token"),
