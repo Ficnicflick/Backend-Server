@@ -2,10 +2,7 @@ package com.example.BackendServer.service;
 
 import com.example.BackendServer.common.exception.BaseException;
 import com.example.BackendServer.dto.oauth2.TokenInfoResponseDto;
-import com.example.BackendServer.dto.user.UserHistoryDto;
 import com.example.BackendServer.dto.user.UserInfoDto;
-import com.example.BackendServer.dto.user.UserNicknameRequestDto;
-import com.example.BackendServer.entity.History;
 import com.example.BackendServer.entity.user.User;
 import com.example.BackendServer.repository.UserRepository;
 import com.example.BackendServer.util.JwtProvider;
@@ -18,10 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.Period;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static com.example.BackendServer.common.response.BaseResponseStatus.*;
 
@@ -90,7 +85,7 @@ public class UserService {
         UserInfoDto userInfoDto = UserInfoDto.builder()
                 .name(user.getNickname())
                 .email(user.getEmail())
-                .warning_cnt(user.getWarningCnt())
+                .warningCnt(user.getWarningCnt())
                 .echoRate(user.getEchoRate())       // 반납 완료 / 전체 대여 횟수
                 .build();
 

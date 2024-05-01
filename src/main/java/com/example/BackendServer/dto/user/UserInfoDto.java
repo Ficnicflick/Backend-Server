@@ -8,6 +8,6 @@ import lombok.Getter;
 public class UserInfoDto {
     private String name;
     private String email;
-    private int warning_cnt;
+    private int warningCnt;
     private double echoRate;      // 탄소저감률
 }
