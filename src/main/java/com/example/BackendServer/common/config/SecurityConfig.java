@@ -36,8 +36,8 @@ public class SecurityConfig {
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class) // 여기까지 jwt 관련 설정
                 .authorizeHttpRequests((authorizeRequests) ->
                         authorizeRequests
+                                .requestMatchers("/ap1/v1/admin/**").hasRole("ADMIN")
                                 .anyRequest().authenticated() // Role : USER 도 추가하면 좋아보임. 왜 hasRole로 하면 실패하는 지 확인 못함
-                                
                 );
 
         return httpSecurity.build();

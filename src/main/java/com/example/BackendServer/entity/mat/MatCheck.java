@@ -1,6 +1,8 @@
 package com.example.BackendServer.entity.mat;
 
 import jakarta.persistence.Embeddable;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -8,6 +10,8 @@ import lombok.Getter;
 public class MatCheck {
 
     private int useCount;
+
+    @Enumerated(value = EnumType.STRING)
     private MatStatus matStatus;
 
     @Builder
