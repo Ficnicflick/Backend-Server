@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -93,28 +95,5 @@ public class UserService {
         return userInfoDto;
     }
 
-    // history (이용내역)
-    public List<UserHistoryDto> getUserHistory(String socialId) throws BaseException {
-        Optional<User> optional = userRepository.findBySocialId(socialId);
 
-        if (optional.isEmpty()) {
-            throw new BaseException(NON_EXIST_USER);
-        }
-
-        User user = optional.get();
-
-        List<History> historyEntityList = user.getHistories();
-        log.info("history size = {}", historyEntityList.size());
-
-        List<UserHistoryDto> historyList = historyEntityList.stream()
-                .map(UserHistoryDto::HistoryEntityToHistoryRes)
-                .collect(Collectors.toList());
-
-        if (historyList.isEmpty()) {
-            return Collections.emptyList();
-        }
-        return historyList;
-    }
-    
-    // history - detail (상세내역)
 }

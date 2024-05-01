@@ -63,14 +63,4 @@ public class UserController {
         }
     }
 
-    // 이용내역
-    @GetMapping("/history")
-    public BaseResponse<List<UserHistoryDto>> getUserHistory(@CurrentUser String socialId) {
-        try {
-            List<UserHistoryDto> historyList = userService.getUserHistory(socialId);
-            return new BaseResponse<>(historyList);
-        } catch (BaseException e) {
-            return new BaseResponse<>(e.getStatus());
-        }
-    }
 }
