@@ -1,6 +1,7 @@
 package com.example.BackendServer.controller;
 
 import com.example.BackendServer.common.CurrentUser;
+import com.example.BackendServer.common.exception.BaseException;
 import com.example.BackendServer.common.response.BaseResponse;
 import com.example.BackendServer.service.KakaoPayService;
 import com.example.BackendServer.kakaopay.request.PayInfoDto;
@@ -8,14 +9,17 @@ import com.example.BackendServer.kakaopay.request.RefundDto;
 import com.example.BackendServer.kakaopay.response.KakaoApproveResponse;
 import com.example.BackendServer.kakaopay.response.KakaoCancelResponse;
 import com.example.BackendServer.kakaopay.response.KakaoReadyResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+
 @RestController
-@RequestMapping("/payment")
+@RequestMapping("api/v1/payment")
 @RequiredArgsConstructor
 @Slf4j
 public class KakaoPayController {
@@ -32,11 +36,22 @@ public class KakaoPayController {
 
     /**
      * 결제 승인
+     * BaseResponse<KakaoApproveResponse> -> void 리턴 타입 변경
+     * todo
      */
     @GetMapping("/success/{id}")
-    public ResponseEntity<KakaoApproveResponse> afterPayRequest(@PathVariable("id")String socialId, @RequestParam("pg_token") String pgToken) {
-        KakaoApproveResponse kakaoApproveResponse = kakaoPayService.ApproveResponse(pgToken, socialId);
-        return ResponseEntity.ok(kakaoApproveResponse);
+    public BaseResponse<KakaoApproveResponse> afterPayRequest(HttpServletResponse response, @PathVariable("id")String socialId, @RequestParam("pg_token") String pgToken) {
+        try {
+            KakaoApproveResponse kakaoApproveResponse = kakaoPayService.ApproveResponse(pgToken, socialId);
+
+//            response.sendRedirect("http://localhost:3000/lental3" + socialId);
+            return new BaseResponse<>(kakaoApproveResponse);
+        } catch (BaseException e) {
+            throw new BaseException(e.getStatus());
+        }
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
     }
 
     /**
@@ -58,8 +73,8 @@ public class KakaoPayController {
      * requestbody
      */
     @PostMapping("/refund")
-    public ResponseEntity<KakaoCancelResponse> refund(@RequestBody RefundDto refundDto) {
+    public BaseResponse<KakaoCancelResponse> refund(@RequestBody RefundDto refundDto) {
         KakaoCancelResponse kakaoCancelResponse = kakaoPayService.kakaoCancel(refundDto);
-        return new ResponseEntity<>(kakaoCancelResponse, HttpStatus.OK);
+        return new BaseResponse<>(kakaoCancelResponse);
     }
 }
