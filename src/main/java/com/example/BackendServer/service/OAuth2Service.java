@@ -80,7 +80,7 @@ public class OAuth2Service {
         Optional<User> findUser = userRepository.findBySocialIdAndProvider(profile.id, provider);
 
         if(findUser.isEmpty()){ //회원 정보 저장하기
-            User createdUser = User.toEntity(profile,provider);
+            User createdUser = User.toEntity(profile, provider);
             createdUser.encodePassword(passwordEncoder);
             userRepository.save(createdUser);
             findUser = Optional.of(createdUser);

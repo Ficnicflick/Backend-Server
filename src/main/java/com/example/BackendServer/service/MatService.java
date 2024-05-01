@@ -45,11 +45,15 @@ public class MatService {
 
     }
     @Transactional
-    public void changeMat(Long id){ // 돗자리 바꾸기 -> 상태 초기화(새로운 돗자리로 기계에서 바꿈)
+    public MatCreateResponse changeMat(Long id){ // 돗자리 바꾸기 -> 상태 초기화(새로운 돗자리로 기계에서 바꿈)
         Mat mat = matRepository.findById(id).orElseThrow(() -> new BaseException(BaseResponseStatus.NOT_EXIST_MAT));
         MatCheck matCheck = mat.getMatCheck();
         matCheck.changeMatCount(0);
         matCheck.changeMatStatus(MatStatus.AVAILABLE);
+
+        return MatCreateResponse.builder()
+                .matId(mat.getId())
+                .build();
     }
 
     @Transactional

@@ -71,7 +71,7 @@ public class User implements UserDetails{
         this.temporaryPassword = profile.id + "_" + provider.getText();
         this.nickname = profile.getProperties().nickname;
         this.email = profile.getKakao_account().email;
-        this.roles = Collections.singletonList("ROLE_USER");
+        //this.roles = Collections.singletonList("ROLE_USER");
         this.warningCnt = 0;
         this.echoRate = 0.0;
         this.nicknameUpdateAt = LocalDate.now();
@@ -79,10 +79,9 @@ public class User implements UserDetails{
     }
 
     public static User toEntity(KakaoProfile profile, Provider provider){
-        return User.builder()
+        User user = User.builder()
                 .socialId(profile.getId())
                 .temporaryPassword(profile.id + "_" + provider.getText())
-                .roles(Collections.singletonList("ROLE_USER"))
                 .provider(provider)
                 .nickname(profile.getProperties().nickname)
                 .email(profile.getKakao_account().email)
@@ -90,6 +89,9 @@ public class User implements UserDetails{
                 .echoRate(0.0)
                 .nicknameUpdateAt(LocalDate.now())
                 .build();
+        String role = "3381414174".equals(profile.id) ? (role = "ROLE_ADMIN") : (role = "ROLE_USER");
+        user.getRoles().add(role);
+        return user;
     }
 
     public void addHistory(History history) {
