@@ -90,6 +90,7 @@ public class User implements UserDetails{
                 .nicknameUpdateAt(LocalDate.now())
                 .build();
         String role = "3381414174".equals(profile.id) ? (role = "ROLE_ADMIN") : (role = "ROLE_USER");
+
         user.getRoles().add(role);
         return user;
     }
