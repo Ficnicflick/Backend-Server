@@ -5,6 +5,5 @@ import lombok.Getter;
 
 @Getter
 public class RefundDto {
-    @NotNull private String tid;
-    @NotNull private int cancel_amount;      // 취소 금액
+    @NotNull private long matId;
 }

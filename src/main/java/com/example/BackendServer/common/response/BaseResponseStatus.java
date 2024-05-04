@@ -25,6 +25,7 @@ public enum BaseResponseStatus {
     BLACK_TOKNE_REFRESHTOKEN(false, HttpStatus.UNAUTHORIZED.value(), "해당 토큰은 블랙 토큰입니다."),
 
     NOT_EXIST_MAT(false, HttpStatus.NOT_FOUND.value(), "존재하지 않는 돗자리입니다."),
+    WRONG_MAT(false, HttpStatus.BAD_REQUEST.value(), "이용할 수 없는 돗자리입니다."),
     NON_EXIST_PAYMENT(false, HttpStatus.NOT_FOUND.value(), "결제 내역이 존재하지 않습니다."),
     NOT_EXIST_HISTORY(false, HttpStatus.NOT_FOUND.value(), "존재하지 않는 이용내역입니다."),
     WRONG_CANCEL_PAYMENT(false, HttpStatus.BAD_REQUEST.value(), "취소 금액이 올바르지 않습니다."),

@@ -4,6 +4,8 @@ import com.example.BackendServer.common.exception.BaseException;
 import com.example.BackendServer.common.response.BaseResponseStatus;
 import com.example.BackendServer.entity.History;
 import com.example.BackendServer.entity.Pay;
+import com.example.BackendServer.entity.mat.Mat;
+import com.example.BackendServer.entity.mat.MatStatus;
 import com.example.BackendServer.entity.user.User;
 import com.example.BackendServer.kakaopay.request.PayInfoDto;
 import com.example.BackendServer.kakaopay.request.RefundDto;
@@ -11,6 +13,7 @@ import com.example.BackendServer.kakaopay.response.KakaoApproveResponse;
 import com.example.BackendServer.kakaopay.response.KakaoCancelResponse;
 import com.example.BackendServer.kakaopay.response.KakaoReadyResponse;
 import com.example.BackendServer.repository.HistoryRepository;
+import com.example.BackendServer.repository.MatRepository;
 import com.example.BackendServer.repository.PayRepository;
 import com.example.BackendServer.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -26,6 +29,8 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -45,6 +50,7 @@ public class KakaoPayService {
     private final PayRepository payRepository;
     private final HistoryRepository historyRepository;
     private final UserRepository userRepository;
+    private final MatRepository matRepository;
 
     private String localUrl = "http://localhost:8080";
 
@@ -58,17 +64,29 @@ public class KakaoPayService {
         }
         User user = optional.get();
 
+        Optional<Mat> optionalMat = matRepository.findById(payInfoDto.getMatId());
+        if (optionalMat.isEmpty()) {
+            throw new BaseException(BaseResponseStatus.NOT_EXIST_MAT);
+        }
+        
+        // 사용 중인 돗자리는 대여 불가
+        Mat mat = optionalMat.get();
+        if (mat.getMatCheck().getMatStatus() == MatStatus.ACTIVE) {
+            throw new BaseException(BaseResponseStatus.WRONG_MAT);
+        }
+
+
         MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
         parameters.add("cid", cid);
         parameters.add("partner_order_id", "가맹점 주문 번호");
         parameters.add("partner_user_id", "가맹점 회원 ID");
         parameters.add("item_name", "PicnicFlick");
-        parameters.add("quantity", String.valueOf(payInfoDto.getQuantity()));       // todo: 돗자리 pk로 변경
-        parameters.add("total_amount", String.valueOf(payInfoDto.getTotal_amount()));
+        parameters.add("quantity", String.valueOf(1));
+        parameters.add("total_amount", String.valueOf(payInfoDto.getTotalAmount()));
         parameters.add("tax_free_amount", "0");
-        parameters.add("approval_url", localUrl +"/payment/success" + "/" + socialId);      // user 식별 가능하게 하기 위해서
-        parameters.add("fail_url", localUrl + "/payment/fail");
-        parameters.add("cancel_url", localUrl + "/payment/cancel");
+        parameters.add("approval_url", serverUrl +"/api/v1/payment/success" + "/" + socialId + '/' + payInfoDto.getMatId());      // user, mat 식별
+        parameters.add("fail_url", serverUrl + "/api/v1/payment/fail");
+        parameters.add("cancel_url", serverUrl + "/api/v1/payment/cancel");
 
 
         HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(parameters, this.getHeaders());
@@ -92,13 +110,18 @@ public class KakaoPayService {
     /**
      * 결제 완료 승인
      */
-    public KakaoApproveResponse ApproveResponse(String pgToken, String socialId) throws BaseException {
+    public KakaoApproveResponse ApproveResponse(String pgToken, String socialId, Long matId) throws BaseException {
         Optional<User> optional = userRepository.findBySocialId(socialId);
-
         if (optional.isEmpty()) {
             throw  new BaseException(BaseResponseStatus.NON_EXIST_USER);
         }
         User user = optional.get();
+
+        Optional<Mat> optionalMat = matRepository.findById(matId);
+        if (optionalMat.isEmpty()) {
+            throw new BaseException(BaseResponseStatus.NOT_EXIST_MAT);
+        }
+
 
         // 카카오 요청
         MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
@@ -119,6 +142,11 @@ public class KakaoPayService {
                 KakaoApproveResponse.class
         );
 
+        // 돗자리 상태 변경
+        Mat mat = optionalMat.get();
+        mat.getMatCheck().countPlus();
+        mat.getMatCheck().changeMatStatus(MatStatus.ACTIVE);
+
         Pay pay = Pay.builder()
                 .tid(kakaoReadyResponse.getTid())
                 .item_name(kakaoApproveResponse.getItem_name())
@@ -130,7 +158,6 @@ public class KakaoPayService {
 
         /**
          * 생성 시 반환 시간은 결제 승인 시간과 동일하게 설정함
-         * 추후에 대여 여부 확인할 때 started_time == returned_time이면 미반납
          */
         History history = History.builder()
                 .started_time(kakaoApproveResponse.getApproved_at())
@@ -139,11 +166,13 @@ public class KakaoPayService {
                 .status(History.Status.NOT_RETURNED)      // 지금 대여했으니까 not return
                 .user(user)
                 .pay(pay)
+                .mat(mat)
                 .build();
 
         try {
             payRepository.save(pay);
             historyRepository.save(history);
+            matRepository.save(mat);
             user.addHistory(history);
         } catch (Exception e) {
             throw new BaseException(BaseResponseStatus.DATABASE_INSERT_ERROR);
@@ -156,27 +185,64 @@ public class KakaoPayService {
      * 결제 환불
      * 지정한 금액만큼 환불
      */
-    public KakaoCancelResponse kakaoCancel(RefundDto refundDto) throws BaseException {
-        // 카카오페이 요청
-        /**
-         * refundDto: String tid, int cancel_amount
-         */
+    public KakaoCancelResponse kakaoCancel(RefundDto refundDto, String socialId) throws BaseException {
+        Optional<Mat> optionalMat = matRepository.findById(refundDto.getMatId());
+        if (optionalMat.isEmpty()) {
+            throw new BaseException(BaseResponseStatus.NOT_EXIST_MAT);
+        }
+        Optional<User> optionalUser = userRepository.findBySocialId(socialId);
+        if (optionalUser.isEmpty()) {
+            throw new BaseException(BaseResponseStatus.NON_EXIST_USER);
+        }
 
-        Optional<Pay> optional = payRepository.findByTid(refundDto.getTid());
+        // 사용자 정보 + mat id
+        Optional<History> optionalHistory = historyRepository.findByUserSocialIdAndMatId(socialId, optionalMat.get().getId());
+        if (optionalHistory.isEmpty()) {
+            throw new BaseException(BaseResponseStatus.NOT_EXIST_HISTORY);
+        }
+        History history = optionalHistory.get();
+
+        Optional<Pay> optional = payRepository.findById(history.getPay().getId());
         if (optional.isEmpty()) {
             throw new BaseException(BaseResponseStatus.NON_EXIST_PAYMENT);
         }
+        
+        Mat mat = history.getMat();
+        User user = optionalUser.get();
+        
+        // 올바르지 않은 돗자리 정보로 결제 취소 시
+        if (mat.getMatCheck().getMatStatus() == MatStatus.AVAILABLE || mat.getMatCheck().getMatStatus() == MatStatus.UNAVAILABLE) {
+            throw new BaseException(BaseResponseStatus.NON_EXIST_PAYMENT);
+        }
+        mat.getMatCheck().changeMatStatus(MatStatus.AVAILABLE);     // 돗자리 상태 사용가능으로 변경
+        history.setStatus(History.Status.RETURNED);                 // history 반납 완료 상태로 변경
 
         Pay requestPay = optional.get();
-        if (requestPay.getTotal() < refundDto.getCancel_amount()) {
+        
+        Duration duration = Duration.between(requestPay.getCreatedAt(), LocalDateTime.now());
+        long hours = duration.toHours();
+        int cancelAmount;
+        if (hours <= 7) cancelAmount = 5000;
+        else if (hours <= 24) cancelAmount = 3000;
+        else cancelAmount = 0;
+
+        if (cancelAmount == 0) {
+            user.plusWarningCnt();
             throw new BaseException(BaseResponseStatus.WRONG_CANCEL_PAYMENT);
         }
 
+        if (requestPay.getTotal() < cancelAmount) {
+            throw new BaseException(BaseResponseStatus.WRONG_CANCEL_PAYMENT);
+        }
+
+        double echoRate = historyRepository.countByUserSocialIdAndStatusReturned(socialId) / historyRepository.countByUserSocialId(socialId);
+        log.info("echoRate: {}", echoRate);
+        user.setEchoRate(echoRate);
 
         MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
         parameters.add("cid", cid);
         parameters.add("tid", requestPay.getTid());     // 결제 고유 번호
-        parameters.add("cancel_amount",String.valueOf(refundDto.getCancel_amount()));        // 환불, 취소 금액
+        parameters.add("cancel_amount",String.valueOf(cancelAmount));        // 환불, 취소 금액
         parameters.add("cancel_tax_free_amount", "0");  // 취소 비과세 금액
 
         HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(parameters, this.getHeaders());
@@ -197,10 +263,13 @@ public class KakaoPayService {
 
         // 변경 내역 db에 저장
         try {
-            requestPay.setRent(requestPay.getTotal() - refundDto.getCancel_amount());
-            requestPay.setDeposit(refundDto.getCancel_amount());        // 취소 금액 == 환불 금액 == 보증금
+            requestPay.setRent(requestPay.getTotal() - cancelAmount);
+            requestPay.setDeposit(cancelAmount);        // 취소 금액 == 환불 금액 == 보증금
 
+            historyRepository.save(history);
             payRepository.save(requestPay);
+            matRepository.save(mat);
+            userRepository.save(user);
         } catch (Exception e) {
             throw new BaseException(BaseResponseStatus.DATABASE_INSERT_ERROR);
         }
