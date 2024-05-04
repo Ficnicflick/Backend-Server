@@ -235,7 +235,7 @@ public class KakaoPayService {
             throw new BaseException(BaseResponseStatus.WRONG_CANCEL_PAYMENT);
         }
 
-        double echoRate = historyRepository.countByUserSocialIdAndStatusReturned(socialId) / historyRepository.countByUserSocialId(socialId);
+        double echoRate = (historyRepository.countByUserSocialIdAndStatusReturned(socialId) / historyRepository.countByUserSocialId(socialId))*100;
         log.info("echoRate: {}", echoRate);
         user.setEchoRate(echoRate);
 
