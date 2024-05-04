@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("api/v1/payment")
+@RequestMapping("/api/v1/payment")
 @RequiredArgsConstructor
 @Slf4j
 public class KakaoPayController {
@@ -39,10 +39,10 @@ public class KakaoPayController {
      * BaseResponse<KakaoApproveResponse> -> void 리턴 타입 변경
      * todo
      */
-    @GetMapping("/success/{id}")
-    public BaseResponse<KakaoApproveResponse> afterPayRequest(HttpServletResponse response, @PathVariable("id")String socialId, @RequestParam("pg_token") String pgToken) {
+    @GetMapping("/success/{id}/{matId}")
+    public BaseResponse<KakaoApproveResponse> afterPayRequest(HttpServletResponse response, @PathVariable("id")String socialId, @PathVariable("matId")Long matId, @RequestParam("pg_token") String pgToken) {
         try {
-            KakaoApproveResponse kakaoApproveResponse = kakaoPayService.ApproveResponse(pgToken, socialId);
+            KakaoApproveResponse kakaoApproveResponse = kakaoPayService.ApproveResponse(pgToken, socialId, matId);
 
 //            response.sendRedirect("http://localhost:3000/lental3" + socialId);
             return new BaseResponse<>(kakaoApproveResponse);
@@ -57,6 +57,7 @@ public class KakaoPayController {
     /**
      * 결제 진행 중 취소
      */
+    @GetMapping("/cancel")
     public BaseResponse<String> cancel() {
         return new BaseResponse<>("결제가 취소되었습니다.");
     }
@@ -64,17 +65,17 @@ public class KakaoPayController {
     /**
      * 결제 실패
      */
+    @GetMapping("/fail")
     public BaseResponse<String> fail() {
         return new BaseResponse<>("결제에 실패하였습니다.");
     }
 
     /**
      * 환불
-     * requestbody
      */
     @PostMapping("/refund")
-    public BaseResponse<KakaoCancelResponse> refund(@RequestBody RefundDto refundDto) {
-        KakaoCancelResponse kakaoCancelResponse = kakaoPayService.kakaoCancel(refundDto);
+    public BaseResponse<KakaoCancelResponse> refund(@RequestBody RefundDto refundDto, @CurrentUser String socialId) {
+        KakaoCancelResponse kakaoCancelResponse = kakaoPayService.kakaoCancel(refundDto, socialId);
         return new BaseResponse<>(kakaoCancelResponse);
     }
 }

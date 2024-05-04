@@ -52,17 +52,23 @@ public class History extends BaseEntity {
         NOT_RETURNED
     }
 
+
     @Builder
-    public History(LocalDateTime started_time, LocalDateTime returned_time, int cnt, Status status, User user, Pay pay) {
+    public History(LocalDateTime started_time, LocalDateTime returned_time, int cnt, Status status, User user, Pay pay, Mat mat) {
         this.started_time = started_time;
         this.returned_time = returned_time;
         this.cnt = cnt;
         this.status = status;
         this.user = user;
         this.pay = pay;
+        this.mat = mat;
     }
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
     }
 }

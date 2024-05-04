@@ -90,7 +90,6 @@ public class User implements UserDetails{
                 .nicknameUpdateAt(LocalDate.now())
                 .build();
         String role = "3381414174".equals(profile.id) ? (role = "ROLE_ADMIN") : (role = "ROLE_USER");
-
         user.getRoles().add(role);
         return user;
     }
@@ -162,5 +161,13 @@ public class User implements UserDetails{
 
     public void setNicknameUpdateAt(LocalDate nicknameUpdateAt) {
         this.nicknameUpdateAt = nicknameUpdateAt;
+    }
+
+    public void plusWarningCnt() {
+        this.warningCnt++;
+    }
+
+    public void setEchoRate(double echoRate) {
+        this.echoRate = echoRate;
     }
 }

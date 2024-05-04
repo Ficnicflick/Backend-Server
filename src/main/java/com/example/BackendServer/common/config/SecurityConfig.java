@@ -47,7 +47,7 @@ public class SecurityConfig {
     public WebSecurityCustomizer webSecurityCustomizer() {
         final String[] NON_AUTHENTICATED = {
             "/swagger-ui/**", "/api-docs/**", "/api/v1/user/ping","/",
-                     "/api/v1/login/**", "/api/v1/login/oauth2/code/kakao", "/v1/payment/**", "/payment/**"
+                     "/api/v1/login/**", "/api/v1/login/oauth2/code/kakao", "/v1/payment/**", "/api/v1/payment/**"
         };
         return web -> {
             web.ignoring()
