@@ -13,10 +13,10 @@ class PlaceTest {
     void getLocation(){
         //given
 
-        Place place = Place.TTUKSEOM_HAN_RIVER;
+        Place place = Place.TTUKSEOM_HAN_RIVER1;
 
         //when
-        Place findPlace = Place.getLocation(100, 200);
+        Place findPlace = Place.getLocation(place.getLantitude(), place.getLogitude());
         //then
         Assertions.assertThat(place).isEqualTo(findPlace);
 
