@@ -17,13 +17,13 @@ public enum Place {
 
 
     private final String location;
-    private final double lantitude;
-    private final double logitude;
+    private final double latitude;
+    private final double longitude;
 
-    public static Place getLocation(double lantitude, double logitude){
+    public static Place getLocation(double latitude, double longitude){
 
         return Arrays
-                .stream(Place.values()).filter(place -> place.getLogitude() == logitude && place.getLantitude() == lantitude)
+                .stream(Place.values()).filter(place -> place.getLongitude() == longitude && place.getLatitude() == latitude)
                 .collect(Collectors.toList()).stream().findFirst().orElseThrow(
                         () -> new BaseException(BaseResponseStatus.NOT_EXIST_PLACE)
                 );
