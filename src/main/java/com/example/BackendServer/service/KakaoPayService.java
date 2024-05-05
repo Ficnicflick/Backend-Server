@@ -168,12 +168,12 @@ public class KakaoPayService {
                 .pay(pay)
                 .mat(mat)
                 .build();
+        user.addHistory(history);
 
         try {
             payRepository.save(pay);
             historyRepository.save(history);
             matRepository.save(mat);
-            user.addHistory(history);
         } catch (Exception e) {
             throw new BaseException(BaseResponseStatus.DATABASE_INSERT_ERROR);
         }
@@ -195,8 +195,9 @@ public class KakaoPayService {
             throw new BaseException(BaseResponseStatus.NON_EXIST_USER);
         }
 
-        // 사용자 정보 + mat id
-        Optional<History> optionalHistory = historyRepository.findByUserSocialIdAndMatId(socialId, optionalMat.get().getId());
+        // 사용자 정보 + mat id + 돗자리 상태
+        Optional<History> optionalHistory = historyRepository.findByUserSocialIdAndMatIdAndStatus(socialId, optionalMat.get().getId(), History.Status.NOT_RETURNED);
+
         if (optionalHistory.isEmpty()) {
             throw new BaseException(BaseResponseStatus.NOT_EXIST_HISTORY);
         }

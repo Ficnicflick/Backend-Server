@@ -35,7 +35,7 @@ public class History extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Status status;
 
-    @OneToOne(fetch = LAZY)
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "mat_id")
     private Mat mat;
 
