@@ -44,7 +44,7 @@ public class KakaoPayController {
         try {
             KakaoApproveResponse kakaoApproveResponse = kakaoPayService.ApproveResponse(pgToken, socialId, matId);
 
-            response.sendRedirect("http://localhost:3000/lental/3");
+            response.sendRedirect("http://localhost:3000/lental/3/" + socialId);
 //            return new BaseResponse<>(kakaoApproveResponse);
         } catch (BaseException e) {
             throw new BaseException(e.getStatus());
