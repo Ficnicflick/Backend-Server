@@ -14,7 +14,7 @@ public interface HistoryRepository extends JpaRepository<History, Long> {
     @Query("select h from History h join fetch h.pay left join fetch h.mat join fetch h.user where h.id = :historyId")
     Optional<History> findHistoryWithMatAndPayAndUser(@Param("historyId") Long historyId);
 
-    Optional<History> findByUserSocialIdAndMatId(String socialId, Long matId);
+    Optional<History> findByUserSocialIdAndMatIdAndStatus(String socialId, Long matId, History.Status status);
 
     @Query("SELECT COUNT(h) FROM History h WHERE h.user.socialId = :socialId")
     Long countByUserSocialId(@Param("socialId") String socialId);

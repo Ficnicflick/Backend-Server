@@ -40,18 +40,17 @@ public class KakaoPayController {
      * todo
      */
     @GetMapping("/success/{id}/{matId}")
-    public BaseResponse<KakaoApproveResponse> afterPayRequest(HttpServletResponse response, @PathVariable("id")String socialId, @PathVariable("matId")Long matId, @RequestParam("pg_token") String pgToken) {
+    public void afterPayRequest(HttpServletResponse response, @PathVariable("id")String socialId, @PathVariable("matId")Long matId, @RequestParam("pg_token") String pgToken) {
         try {
             KakaoApproveResponse kakaoApproveResponse = kakaoPayService.ApproveResponse(pgToken, socialId, matId);
 
-//            response.sendRedirect("http://localhost:3000/lental3" + socialId);
-            return new BaseResponse<>(kakaoApproveResponse);
+            response.sendRedirect("http://localhost:3000/lental/3/" + socialId);
+//            return new BaseResponse<>(kakaoApproveResponse);
         } catch (BaseException e) {
             throw new BaseException(e.getStatus());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
     }
 
     /**
