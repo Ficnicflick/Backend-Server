@@ -47,7 +47,6 @@ public class HistoryCustomRepositoryImpl implements HistoryCustomRepository{
     }
 
     private BooleanExpression statusCheck(History.Status statusCond) {
-        return  statusCond == null ? null :
-                (statusCond == RETURNED ? history.status.eq(RETURNED) : history.status.eq(NOT_RETURNED));
+        return  statusCond == null ? null : history.status.eq(statusCond);
     }
 }
