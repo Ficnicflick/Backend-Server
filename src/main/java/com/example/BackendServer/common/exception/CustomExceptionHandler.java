@@ -34,21 +34,6 @@ public class CustomExceptionHandler {
         return response;
     }
 
-   /* catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
-        log.info("Invalid JWT Token", e);
-        setErrorResponse(response, INVALID_TOKEN);
-    } catch (
-    ExpiredJwtException e) {
-        log.info("Expired JWT Token", e);
-        setErrorResponse(response, EXPRIED_TOKEN);
-    } catch (
-    UnsupportedJwtException e) {
-        log.info("Unsupported JWT Token", e);
-        setErrorResponse(response, UNSURPPORTED_TOKEN);
-    } catch (IllegalArgumentException e) {
-        log.info("JWT claims string is empty.", e);
-        setErrorResponse(response, EMPTY_TOKEN_CLAIM);
-    }*/
     // jwt exception
    @ExceptionHandler(value = {io.jsonwebtoken.security.SecurityException.class, MalformedJwtException.class})
    public BaseResponse<BaseResponseStatus> handleJwtException1(){
@@ -65,10 +50,10 @@ public class CustomExceptionHandler {
 
         return new BaseResponse<>(UNSURPPORTED_TOKEN);
     }
-    @ExceptionHandler(value = IllegalArgumentException.class)
+    /*@ExceptionHandler(value = IllegalArgumentException.class)
     public BaseResponse<BaseResponseStatus> handleJwtException4(){
 
         return new BaseResponse<>(EMPTY_TOKEN_CLAIM);
-    }
+    }*/
 
 }

@@ -1,5 +1,6 @@
 package com.example.BackendServer.entity.mat;
 
+import jakarta.validation.constraints.Size;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,10 +14,16 @@ class PlaceTest {
     void getLocation(){
         //given
 
-        Place place = Place.TTUKSEOM_HAN_RIVER;
+        double logitude = 127.0699562;
+
+        double lantitude = 37.5293507;
+
+        Place place = Place.TTUKSEOM_HAN_RIVER1;
+        System.out.println(place.getLocation());
+        System.out.println(place.getLatitude());
 
         //when
-        Place findPlace = Place.getLocation(100, 200);
+        Place findPlace = Place.getLocation(place.getLatitude(), place.getLongitude());
         //then
         Assertions.assertThat(place).isEqualTo(findPlace);
 

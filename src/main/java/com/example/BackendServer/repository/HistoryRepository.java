@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface HistoryRepository extends JpaRepository<History, Long> {
+public interface HistoryRepository extends JpaRepository<History, Long>, HistoryCustomRepository {
 
     @Query("select h from History h join fetch h.pay left join fetch h.mat join fetch h.user where h.id = :historyId")
     Optional<History> findHistoryWithMatAndPayAndUser(@Param("historyId") Long historyId);
