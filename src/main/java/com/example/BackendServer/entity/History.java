@@ -49,6 +49,7 @@ public class History extends BaseEntity {
 
     public enum Status {
         RETURNED,
+        LATE_RETURNED,
         NOT_RETURNED
     }
 
