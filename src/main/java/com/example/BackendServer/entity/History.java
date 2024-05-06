@@ -49,6 +49,7 @@ public class History extends BaseEntity {
 
     public enum Status {
         RETURNED,
+        LATE_RETURNED,
         NOT_RETURNED
     }
 
@@ -70,5 +71,9 @@ public class History extends BaseEntity {
 
     public void setStatus(Status status) {
         this.status = status;
+    }
+
+    public void setReturned_time(LocalDateTime returned_time) {
+        this.returned_time = returned_time;
     }
 }

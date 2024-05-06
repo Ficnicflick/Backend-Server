@@ -37,7 +37,6 @@ public class KakaoPayController {
     /**
      * 결제 승인
      * BaseResponse<KakaoApproveResponse> -> void 리턴 타입 변경
-     * todo
      */
     @GetMapping("/success/{id}/{matId}")
     public void afterPayRequest(HttpServletResponse response, @PathVariable("id")String socialId, @PathVariable("matId")Long matId, @RequestParam("pg_token") String pgToken) {
