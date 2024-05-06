@@ -6,7 +6,8 @@ import org.springframework.http.HttpStatus;
 @Getter
 public enum BaseResponseStatus {
     /** 성공 2xx */
-    SUCCESS(true, HttpStatus.OK.value(), "요청에 성공하였습니다"),
+    SUCCESS(true, HttpStatus.OK.value(), "요청에 성공하였습니다."),
+    RETURNED(true, HttpStatus.OK.value(), "반납이 완료되었습니다."),
 
 
     /** client error - 4xx */

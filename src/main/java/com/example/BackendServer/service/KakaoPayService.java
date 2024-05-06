@@ -137,7 +137,6 @@ public class KakaoPayService {
 
         KakaoApproveResponse kakaoApproveResponse = restTemplate.postForObject(
                 "https://kapi.kakao.com/v1/payment/approve",
-//                "https://open-api.kakaopay.com/online/v1/payment/approve",
                 requestEntity,
                 KakaoApproveResponse.class
         );
@@ -183,62 +182,61 @@ public class KakaoPayService {
 
     /**
      * 결제 환불
-     * 지정한 금액만큼 환불
      */
     public KakaoCancelResponse kakaoCancel(RefundDto refundDto, String socialId) throws BaseException {
         Optional<Mat> optionalMat = matRepository.findById(refundDto.getMatId());
         if (optionalMat.isEmpty()) {
             throw new BaseException(BaseResponseStatus.NOT_EXIST_MAT);
         }
+        Mat mat = optionalMat.get();
+
         Optional<User> optionalUser = userRepository.findBySocialId(socialId);
         if (optionalUser.isEmpty()) {
             throw new BaseException(BaseResponseStatus.NON_EXIST_USER);
         }
+        User user = optionalUser.get();
 
         // 사용자 정보 + mat id + 돗자리 상태
         Optional<History> optionalHistory = historyRepository.findByUserSocialIdAndMatIdAndStatus(socialId, optionalMat.get().getId(), History.Status.NOT_RETURNED);
-
         if (optionalHistory.isEmpty()) {
             throw new BaseException(BaseResponseStatus.NOT_EXIST_HISTORY);
         }
         History history = optionalHistory.get();
 
-        Optional<Pay> optional = payRepository.findById(history.getPay().getId());
-        if (optional.isEmpty()) {
+        Optional<Pay> optionalPay = payRepository.findById(history.getPay().getId());
+        if (optionalPay.isEmpty()) {
             throw new BaseException(BaseResponseStatus.NON_EXIST_PAYMENT);
         }
-        
-        Mat mat = history.getMat();
-        User user = optionalUser.get();
-        
+        Pay requestPay = optionalPay.get();
+
         // 올바르지 않은 돗자리 정보로 결제 취소 시
         if (mat.getMatCheck().getMatStatus() == MatStatus.AVAILABLE || mat.getMatCheck().getMatStatus() == MatStatus.UNAVAILABLE) {
             throw new BaseException(BaseResponseStatus.NON_EXIST_PAYMENT);
         }
-        mat.getMatCheck().changeMatStatus(MatStatus.AVAILABLE);     // 돗자리 상태 사용가능으로 변경
-        history.setStatus(History.Status.RETURNED);                 // history 반납 완료 상태로 변경
 
-        Pay requestPay = optional.get();
-        
         Duration duration = Duration.between(requestPay.getCreatedAt(), LocalDateTime.now());
         long hours = duration.toHours();
         int cancelAmount;
-        if (hours <= 7) cancelAmount = 5000;
-        else if (hours <= 24) cancelAmount = 3000;
-        else cancelAmount = 0;
+        if (hours <= 6) {
+            cancelAmount = 5000;
+            history.setStatus(History.Status.RETURNED);                 // history 반납 완료 상태로 변경
+        }
+        else if (hours <= 24) {
+            cancelAmount = 3000;
+            history.setStatus(History.Status.LATE_RETURNED);
+        }
+        else {
+            cancelAmount = 0;
+            history.setStatus(History.Status.LATE_RETURNED);
+        }
 
         if (cancelAmount == 0) {
             user.plusWarningCnt();
-            throw new BaseException(BaseResponseStatus.WRONG_CANCEL_PAYMENT);
+            throw new BaseException(BaseResponseStatus.RETURNED);
         }
-
         if (requestPay.getTotal() < cancelAmount) {
             throw new BaseException(BaseResponseStatus.WRONG_CANCEL_PAYMENT);
         }
-
-        double echoRate = (historyRepository.countByUserSocialIdAndStatusReturned(socialId) / historyRepository.countByUserSocialId(socialId))*100;
-        log.info("echoRate: {}", echoRate);
-        user.setEchoRate(echoRate);
 
         MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
         parameters.add("cid", cid);
@@ -262,11 +260,16 @@ public class KakaoPayService {
             throw e;
         }
 
-        // 변경 내역 db에 저장
-        try {
-            requestPay.setRent(requestPay.getTotal() - cancelAmount);
-            requestPay.setDeposit(cancelAmount);        // 취소 금액 == 환불 금액 == 보증금
+        mat.getMatCheck().changeMatStatus(MatStatus.AVAILABLE);     // 돗자리 상태 사용가능으로 변경
 
+        double echoRate = (historyRepository.countByUserSocialIdAndStatusReturned(socialId) / historyRepository.countByUserSocialId(socialId))*100;
+        user.setEchoRate(echoRate);
+
+        requestPay.setRent(requestPay.getTotal() - cancelAmount);
+        requestPay.setDeposit(cancelAmount);        // 취소 금액 == 환불 금액 == 보증금
+        history.setReturned_time(LocalDateTime.now());
+
+        try {
             historyRepository.save(history);
             payRepository.save(requestPay);
             matRepository.save(mat);
@@ -279,11 +282,6 @@ public class KakaoPayService {
     }
 
 
-    /**
-     * 구 카카오페이 헤더
-     * admin_key
-     * @return
-     */
     private HttpHeaders getHeaders() {
         HttpHeaders headers = new HttpHeaders();
 
