@@ -19,11 +19,11 @@ class PlaceTest {
         double lantitude = 37.5293507;
 
         Place place = Place.TTUKSEOM_HAN_RIVER1;
-        System.out.println(place.getLantitude());
-        System.out.println(place.getLogitude());
+        System.out.println(place.getLocation());
+        System.out.println(place.getLatitude());
 
         //when
-        Place findPlace = Place.getLocation(place.getLantitude(), place.getLogitude());
+        Place findPlace = Place.getLocation(place.getLatitude(), place.getLongitude());
         //then
         Assertions.assertThat(place).isEqualTo(findPlace);
 

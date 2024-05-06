@@ -1,15 +1,19 @@
 package com.example.BackendServer.entity;
 
 import com.example.BackendServer.common.entity.BaseEntity;
+import com.example.BackendServer.common.exception.BaseException;
+import com.example.BackendServer.common.response.BaseResponseStatus;
 import com.example.BackendServer.entity.mat.Mat;
+import com.example.BackendServer.entity.mat.Place;
 import com.example.BackendServer.entity.user.User;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.EnumSet;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static jakarta.persistence.FetchType.LAZY;
 
@@ -47,10 +51,16 @@ public class History extends BaseEntity {
     @JoinColumn(name = "pay_id")
     private Pay pay;
 
+    @Getter
+    @RequiredArgsConstructor
     public enum Status {
         RETURNED,
         LATE_RETURNED,
-        NOT_RETURNED
+        NOT_RETURNED;
+        public static Status getStatus(String text){
+
+            return text == null ? null : Status.valueOf(Status.class, text);
+        }
     }
 
 

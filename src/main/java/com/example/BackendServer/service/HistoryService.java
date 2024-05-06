@@ -3,7 +3,9 @@ package com.example.BackendServer.service;
 import com.example.BackendServer.common.exception.BaseException;
 import com.example.BackendServer.common.response.BaseResponse;
 import com.example.BackendServer.common.response.BaseResponseStatus;
+import com.example.BackendServer.dto.history.request.HistoryStatusRequest;
 import com.example.BackendServer.dto.history.response.DetailsHistoryDto;
+import com.example.BackendServer.dto.history.response.HistoryResponse;
 import com.example.BackendServer.dto.user.UserHistoryDto;
 import com.example.BackendServer.entity.History;
 import com.example.BackendServer.entity.Pay;
@@ -14,14 +16,19 @@ import com.example.BackendServer.repository.HistoryRepository;
 import com.example.BackendServer.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.example.BackendServer.common.response.BaseResponseStatus.FORBBIDEN_USER_ROLR;
 import static com.example.BackendServer.common.response.BaseResponseStatus.NON_EXIST_USER;
 
 @Service @Slf4j
@@ -32,6 +39,7 @@ public class HistoryService {
     private final UserRepository userRepository;
     private final HistoryRepository historyRepository;
 
+    private final static int HISTORY_PAGE_SIZE = 10;
 
     public DetailsHistoryDto getDetailsHistory(Long id, String socialId) {
         User user = userRepository.findBySocialIdAndProvider(socialId, Provider.KAKAO)
@@ -80,5 +88,34 @@ public class HistoryService {
             return Collections.emptyList();
         }
         return historyList;
+    }
+
+    public HistoryResponse getHistoryByCategory(String state, int pageNumber, String socialId) {
+        User user = userRepository.findBySocialId(socialId)
+                .orElseThrow(() -> new BaseException(NON_EXIST_USER));
+        
+        if(!user.getRoles().contains("ROLE_ADMIN")){
+            throw new BaseException(FORBBIDEN_USER_ROLR);
+        }
+        History.Status status = History.Status.getStatus(state);;
+        Page<History> histories = historyRepository.searchHistoryBy(status, PageRequest.of(pageNumber, HISTORY_PAGE_SIZE));
+
+        return HistoryResponse.builder()
+                .pageNumber(pageNumber)
+                .totalPages(histories.getTotalPages())
+                .totalCount(histories.getTotalElements())
+                .historyList(histories.stream()
+                        .map(history -> DetailsHistoryDto
+                                .builder()
+                                .started_time(history.getStarted_time())
+                                .returned_time(history.getReturned_time())
+                                .cnt(history.getCnt())
+                                .status(history.getStatus())
+                                .location(history.getMat().getPlace().getLocation())
+                                .itemName(history.getPay().getItem_name())
+                                .totalPrice(history.getPay().getTotal())
+                                .build())
+                        .collect(Collectors.toList()))
+                .build();
     }
 }
