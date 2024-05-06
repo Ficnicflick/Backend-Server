@@ -4,6 +4,7 @@ import com.example.BackendServer.dto.KakaoProfile;
 import com.example.BackendServer.entity.History;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,7 +18,7 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @Entity @Getter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
+@AllArgsConstructor @Slf4j
 public class User implements UserDetails{
 
     @Id
@@ -89,7 +90,9 @@ public class User implements UserDetails{
                 .echoRate(0.0)
                 .nicknameUpdateAt(LocalDate.now())
                 .build();
-        String role = "3381414174".equals(profile.id) ? (role = "ROLE_ADMIN") : (role = "ROLE_USER");
+        String role = "3381414174".equals(profile.id) || "3430660126".equals(profile.id)? (role = "ROLE_ADMIN") : (role = "ROLE_USER");
+        log.info("[ROLE]: {}", role);
+
         user.getRoles().add(role);
         return user;
     }
