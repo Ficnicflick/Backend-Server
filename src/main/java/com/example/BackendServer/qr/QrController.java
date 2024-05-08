@@ -25,7 +25,7 @@ public class QrController {
         int height = 200;
 
         /** 임시 url */
-        String url = "https://picnicflick.store/lental/1";
+        String url = "1";
 
         // bitMatrix 형식으로 qr 생성
         BitMatrix matrix = new MultiFormatWriter().encode(url, BarcodeFormat.QR_CODE, width, height);

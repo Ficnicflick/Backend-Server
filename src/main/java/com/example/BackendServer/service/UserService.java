@@ -107,10 +107,10 @@ public class UserService {
         Period between = Period.between(LocalDate.now(), lastUpdate);
         int amount = between.getDays();
 
-//         변경 기간 확인
-        if (amount < 7) {
-            throw new BaseException(LIMIT_NICKNAME_CHANGE);
-        }
+////         변경 기간 확인
+//        if (amount < 7) {
+//            throw new BaseException(LIMIT_NICKNAME_CHANGE);
+//        }
 
         try {
             user.setNickname(nickname);

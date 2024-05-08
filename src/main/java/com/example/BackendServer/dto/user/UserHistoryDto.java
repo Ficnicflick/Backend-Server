@@ -42,7 +42,7 @@ public class UserHistoryDto {
                 history.getMat().getPlace().getLocation(),
                 history.getCnt(),
                 history.getStatus(),
-                history.getPay().getTotal()     // todo: rent? total?
+                history.getPay().getRent()     // 실제 결제 비용을 넘겨줌
         );
     }
 }
