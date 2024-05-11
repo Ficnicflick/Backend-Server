@@ -60,6 +60,7 @@ public class HistoryService {
                 .status(history.getStatus())
                 .location(mat.isPresent()? mat.get().getPlace().getLocation() : null)
                 .itemName(pay.getItem_name())
+                .matId(mat.isPresent()? mat.get().getId(): null)
                 .cnt(pay.getQuantity())
                 .totalPrice(pay.getTotal())
                 .rentPrice(pay.getRent())

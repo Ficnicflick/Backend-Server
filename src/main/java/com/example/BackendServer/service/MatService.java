@@ -67,8 +67,8 @@ public class MatService {
         matRepository.delete(mat);
     }
 
-    public MatPlaceResponse getMatCountInPlace(PlaceRequest dto){
-        Place place = Place.getLocation(dto.getPlaceId());
+    public MatPlaceResponse getMatCountInPlace(Long placeId){
+        Place place = Place.getLocation(placeId);
         List<Mat> matList = matRepository.findAllByPlaceAndAvailableMat(place, MatStatus.AVAILABLE);
         List<Long> matIdList = matList.stream()
                 .map(mat -> mat.getId())

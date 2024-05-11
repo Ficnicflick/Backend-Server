@@ -36,8 +36,8 @@ public class MatController {
     }
 
     @GetMapping
-    public BaseResponse<MatPlaceResponse> findMatListInPlace(@Valid @RequestBody PlaceRequest dto){
+    public BaseResponse<MatPlaceResponse> findMatListInPlace(@RequestParam("placeId") Long placeId){
 
-        return new BaseResponse<>(matService.getMatCountInPlace(dto));
+        return new BaseResponse<>(matService.getMatCountInPlace(placeId));
     }
 }
