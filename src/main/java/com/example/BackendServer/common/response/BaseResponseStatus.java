@@ -31,7 +31,7 @@ public enum BaseResponseStatus {
     NON_EXIST_PAYMENT(false, HttpStatus.NOT_FOUND.value(), "결제 내역이 존재하지 않습니다."),
     NOT_EXIST_HISTORY(false, HttpStatus.NOT_FOUND.value(), "존재하지 않는 이용내역입니다."),
     WRONG_CANCEL_PAYMENT(false, HttpStatus.BAD_REQUEST.value(), "취소 금액이 올바르지 않습니다."),
-    NOT_EXIST_PLACE(false, HttpStatus.NOT_FOUND.value(), "존재하지 않는 위치(위도, 경도)입니다."),
+    NOT_EXIST_PLACE(false, HttpStatus.NOT_FOUND.value(), "존재하지 않는 위치입니다."),
     NOT_EXIST_STATUS(false, HttpStatus.NOT_FOUND.value(), "존재하지 않는 상태입니다."),
 
     USER_MISMATCH(false, HttpStatus.CONFLICT.value(), "같은 회원이 아닙니다."),

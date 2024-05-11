@@ -7,9 +7,7 @@ import lombok.Setter;
 
 @Getter @Setter
 public class PlaceRequest {
-    @NotNull(message = "latitude 필수입니다.")
-    private Double latitude;
-    @NotNull(message = "longitude 필수입니다.")
-    private Double longitude;
+    @NotNull(message = "위치 번호는 필수입니다.")
+    private Long placeId;
 
 }

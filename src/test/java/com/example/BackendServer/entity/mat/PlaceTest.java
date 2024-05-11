@@ -23,7 +23,7 @@ class PlaceTest {
         System.out.println(place.getLatitude());
 
         //when
-        Place findPlace = Place.getLocation(place.getLatitude(), place.getLongitude());
+        Place findPlace = Place.getLocation(place.getPlaceId());
         //then
         Assertions.assertThat(place).isEqualTo(findPlace);
 

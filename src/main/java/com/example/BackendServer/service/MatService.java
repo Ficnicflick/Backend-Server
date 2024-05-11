@@ -34,7 +34,7 @@ public class MatService {
     public MatCreateResponse addMat(MatCreateRequest request){ // 돗자리 추가하기
 
         MatCheck matCheck = MatCheck.builder().build();
-        Place place = Place.getLocation(request.getLantitude(), request.getLogitude());
+        Place place = Place.getLocation(request.getPlaceId());
 
         Mat mat = Mat.builder()
                 .price(request.getPrice())
@@ -68,7 +68,7 @@ public class MatService {
     }
 
     public MatPlaceResponse getMatCountInPlace(PlaceRequest dto){
-        Place place = Place.getLocation(dto.getLatitude(), dto.getLongitude());
+        Place place = Place.getLocation(dto.getPlaceId());
         List<Mat> matList = matRepository.findAllByPlaceAndAvailableMat(place, MatStatus.AVAILABLE);
         List<Long> matIdList = matList.stream()
                 .map(mat -> mat.getId())
