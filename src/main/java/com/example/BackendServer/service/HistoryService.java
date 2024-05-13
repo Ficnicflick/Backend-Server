@@ -28,8 +28,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.example.BackendServer.common.response.BaseResponseStatus.FORBBIDEN_USER_ROLR;
-import static com.example.BackendServer.common.response.BaseResponseStatus.NON_EXIST_USER;
+import static com.example.BackendServer.common.response.BaseResponseStatus.*;
 
 @Service @Slf4j
 @RequiredArgsConstructor
@@ -118,5 +117,12 @@ public class HistoryService {
                                 .build())
                         .collect(Collectors.toList()))
                 .build();
+    }
+
+    public Object getUsedHistory(String socialId) {
+        User user = userRepository.searchUserWithUsedHistories(socialId)
+                .orElseThrow(() -> new BaseException(NON_EXIST_USER));
+
+        return null;
     }
 }

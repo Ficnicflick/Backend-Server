@@ -40,12 +40,17 @@ public class    HistoryController {
         }
     }
 
-    // 이용내역
+    // 관리자 이용내역
     @GetMapping("/admin")
     public BaseResponse<HistoryResponse> findHistoryAllBy(@RequestParam(required = false) String status
             , @RequestParam(defaultValue = "0", name = "pageNumber", required = false) int pageNumber, @CurrentUser String socialId) {
 
         return new BaseResponse<>(historyService.getHistoryByCategory(status, pageNumber, socialId));
+    }
+
+    @GetMapping("/use")
+    public BaseResponse<?> findUsedHistory(@CurrentUser String socialId){
+        return new BaseResponse<>(historyService.getUsedHistory(socialId));
     }
 }
 
