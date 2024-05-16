@@ -151,7 +151,7 @@ public class KakaoPayService {
                 .item_name(kakaoApproveResponse.getItem_name())
                 .quantity(kakaoApproveResponse.getQuantity())
                 .total(kakaoApproveResponse.getAmount().getTotal())
-                .rent(0)
+                .rent(7000)
                 .deposit(0)     // 대여한 순간은 환불된 금액이 없으므로 0
                 .build();
 
