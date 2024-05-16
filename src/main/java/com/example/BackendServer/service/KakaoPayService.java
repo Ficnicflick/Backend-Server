@@ -155,12 +155,10 @@ public class KakaoPayService {
                 .deposit(0)     // 대여한 순간은 환불된 금액이 없으므로 0
                 .build();
 
-        /**
-         * 생성 시 반환 시간은 결제 승인 시간과 동일하게 설정함
-         */
+
         History history = History.builder()
-                .started_time(kakaoApproveResponse.getApproved_at())
-                .returned_time(kakaoApproveResponse.getApproved_at())       // 일단 생성되면 returnedTime은 대여 시간과 동일하게 설정
+                .startedTime(kakaoApproveResponse.getApproved_at())
+                .returnedTime(kakaoApproveResponse.getApproved_at())       // 일단 생성되면 returnedTime은 대여 시간과 동일하게 설정
                 .cnt(kakaoApproveResponse.getQuantity())
                 .status(History.Status.NOT_RETURNED)      // 지금 대여했으니까 not return
                 .user(user)
@@ -267,7 +265,7 @@ public class KakaoPayService {
 
         requestPay.setRent(requestPay.getTotal() - cancelAmount);
         requestPay.setDeposit(cancelAmount);        // 취소 금액 == 환불 금액 == 보증금
-        history.setReturned_time(LocalDateTime.now());
+        history.setReturnedTime(LocalDateTime.now());
 
         try {
             historyRepository.save(history);

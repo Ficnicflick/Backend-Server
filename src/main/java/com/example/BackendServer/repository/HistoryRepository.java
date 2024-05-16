@@ -21,4 +21,5 @@ public interface HistoryRepository extends JpaRepository<History, Long>, History
     @Query("SELECT COUNT(h) FROM History h WHERE h.user.socialId = :socialId AND h.status = 'RETURNED'")
     Long countByUserSocialIdAndStatusReturned(@Param("socialId") String socialId);
 
+    History findTopByUserSocialIdOrderByCreatedAtDesc(String socialId);
 }

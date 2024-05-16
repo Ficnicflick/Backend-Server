@@ -36,9 +36,9 @@ public class UserHistoryDto {
     public static UserHistoryDto HistoryEntityToHistoryRes(History history) {
         return new UserHistoryDto(
                 history.getId(),
-                history.getStarted_time(),
-                history.getStarted_time().toLocalTime(),
-                history.getReturned_time().toLocalTime(),
+                history.getStartedTime(),
+                history.getStartedTime().toLocalTime(),
+                history.getReturnedTime().toLocalTime(),
                 history.getMat().getPlace().getLocation(),
                 history.getCnt(),
                 history.getStatus(),
