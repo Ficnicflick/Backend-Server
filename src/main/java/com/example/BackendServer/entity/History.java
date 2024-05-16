@@ -1,19 +1,12 @@
 package com.example.BackendServer.entity;
 
 import com.example.BackendServer.common.entity.BaseEntity;
-import com.example.BackendServer.common.exception.BaseException;
-import com.example.BackendServer.common.response.BaseResponseStatus;
 import com.example.BackendServer.entity.mat.Mat;
-import com.example.BackendServer.entity.mat.Place;
 import com.example.BackendServer.entity.user.User;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.EnumSet;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static jakarta.persistence.FetchType.LAZY;
 
@@ -27,10 +20,10 @@ public class History extends BaseEntity {
     private Long id;
 
     @Column(nullable = false)
-    private LocalDateTime started_time;
+    private LocalDateTime startedTime;
 
     @Column(nullable = false)
-    private LocalDateTime returned_time;
+    private LocalDateTime returnedTime;
 
     @Column(nullable = false)
     private int cnt;
@@ -65,9 +58,9 @@ public class History extends BaseEntity {
 
 
     @Builder
-    public History(LocalDateTime started_time, LocalDateTime returned_time, int cnt, Status status, User user, Pay pay, Mat mat) {
-        this.started_time = started_time;
-        this.returned_time = returned_time;
+    public History(LocalDateTime startedTime, LocalDateTime returnedTime, int cnt, Status status, User user, Pay pay, Mat mat) {
+        this.startedTime = startedTime;
+        this.returnedTime = returnedTime;
         this.cnt = cnt;
         this.status = status;
         this.user = user;
@@ -83,7 +76,7 @@ public class History extends BaseEntity {
         this.status = status;
     }
 
-    public void setReturned_time(LocalDateTime returned_time) {
-        this.returned_time = returned_time;
+    public void setReturnedTime(LocalDateTime returnedTime) {
+        this.returnedTime = returnedTime;
     }
 }
