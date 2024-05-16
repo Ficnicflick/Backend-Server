@@ -6,6 +6,7 @@ import com.example.BackendServer.common.response.BaseResponse;
 import com.example.BackendServer.dto.history.request.HistoryStatusRequest;
 import com.example.BackendServer.dto.history.response.DetailsHistoryDto;
 import com.example.BackendServer.dto.history.response.HistoryResponse;
+import com.example.BackendServer.dto.history.response.HistorySimpleDto;
 import com.example.BackendServer.dto.user.UserHistoryDto;
 import com.example.BackendServer.entity.History;
 import com.example.BackendServer.service.HistoryService;
@@ -40,7 +41,7 @@ public class    HistoryController {
         }
     }
 
-    // 이용내역
+    // 관리자 이용내역
     @GetMapping("/admin")
     public BaseResponse<HistoryResponse> findHistoryAllBy(@RequestParam(required = false) String status
             , @RequestParam(defaultValue = "0", name = "pageNumber", required = false) int pageNumber, @CurrentUser String socialId) {

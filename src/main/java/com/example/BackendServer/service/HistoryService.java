@@ -1,10 +1,10 @@
 package com.example.BackendServer.service;
 
 import com.example.BackendServer.common.exception.BaseException;
-import com.example.BackendServer.common.response.BaseResponse;
 import com.example.BackendServer.common.response.BaseResponseStatus;
 import com.example.BackendServer.dto.history.response.DetailsHistoryDto;
 import com.example.BackendServer.dto.history.response.HistoryResponse;
+import com.example.BackendServer.dto.history.response.HistorySimpleDto;
 import com.example.BackendServer.dto.user.UserHistoryDto;
 import com.example.BackendServer.entity.History;
 import com.example.BackendServer.entity.Pay;
@@ -58,6 +58,7 @@ public class HistoryService {
                 .status(history.getStatus())
                 .location(mat.isPresent()? mat.get().getPlace().getLocation() : null)
                 .itemName(pay.getItem_name())
+                .matId(mat.isPresent()? mat.get().getId(): null)
                 .cnt(pay.getQuantity())
                 .totalPrice(pay.getTotal())
                 .rentPrice(pay.getRent())
@@ -95,7 +96,7 @@ public class HistoryService {
         if(!user.getRoles().contains("ROLE_ADMIN")){
             throw new BaseException(FORBBIDEN_USER_ROLR);
         }
-        History.Status status = History.Status.getStatus(state);;
+        History.Status status = History.Status.getStatus(state);
         Page<History> histories = historyRepository.searchHistoryBy(status, PageRequest.of(pageNumber, HISTORY_PAGE_SIZE));
 
         return HistoryResponse.builder()

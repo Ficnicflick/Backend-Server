@@ -9,12 +9,14 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 public class DetailsHistoryDto {
 
     private LocalDateTime started_time; // 대여 시간
     private LocalDateTime returned_time; // 반납 예정 시간
+    private Long matId;
     private int cnt; // 개수
     private History.Status status; // 반납 여부 확인
     private String location; // 돗자리 장소 정보
@@ -24,10 +26,11 @@ public class DetailsHistoryDto {
     private int despositPrice; // 보증금
 
     @Builder
-    public DetailsHistoryDto(LocalDateTime started_time, LocalDateTime returned_time, int cnt, History.Status status
+    public DetailsHistoryDto(LocalDateTime started_time, LocalDateTime returned_time,Long matId, int cnt, History.Status status
             , String location, String itemName, int totalPrice, int rentPrice, int despositPrice) {
         this.started_time = started_time;
         this.returned_time = returned_time;
+        this.matId = matId;
         this.cnt = cnt;
         this.status = status;
         this.location = location;
