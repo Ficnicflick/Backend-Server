@@ -41,7 +41,7 @@ public class UserCustomRepositoryImpl implements UserCustomRepository{
     }
 
     private BooleanExpression checkTime(QHistory history) {
-        return history.started_time.after(LocalDateTime.now().minusHours(RENTAL_TIME));
+        return history.startedTime.after(LocalDateTime.now().minusHours(RENTAL_TIME));
     }
 
     private BooleanExpression eqUsedState() {
