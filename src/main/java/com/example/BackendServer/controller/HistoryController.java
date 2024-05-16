@@ -49,10 +49,14 @@ public class    HistoryController {
         return new BaseResponse<>(historyService.getHistoryByCategory(status, pageNumber, socialId));
     }
 
-    @GetMapping("/use")
-    public BaseResponse<List<HistorySimpleDto>> findUsedHistory(@CurrentUser String socialId){
-
-        return new BaseResponse<>(historyService.getUsedHistory(socialId));
+    @GetMapping("/recent")
+    public BaseResponse<History.Status> recentHistory(@CurrentUser String socialId) {
+        try {
+            History.Status status = historyService.recentMatStatus(socialId);
+            return new BaseResponse<>(status);
+        } catch (BaseException e) {
+            return new BaseResponse<>(e.getStatus());
+        }
     }
 }
 

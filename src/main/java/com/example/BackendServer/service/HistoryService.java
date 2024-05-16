@@ -20,6 +20,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -51,8 +53,8 @@ public class HistoryService {
         Pay pay = history.getPay();
 
         return DetailsHistoryDto.builder()
-                .started_time(history.getStarted_time())
-                .returned_time(history.getReturned_time())
+                .started_time(history.getStartedTime())
+                .returned_time(history.getReturnedTime())
                 .status(history.getStatus())
                 .location(mat.isPresent()? mat.get().getPlace().getLocation() : null)
                 .itemName(pay.getItem_name())
@@ -104,8 +106,8 @@ public class HistoryService {
                 .historyList(histories.stream()
                         .map(history -> DetailsHistoryDto
                                 .builder()
-                                .started_time(history.getStarted_time())
-                                .returned_time(history.getReturned_time())
+                                .started_time(history.getStartedTime())
+                                .returned_time(history.getReturnedTime())
                                 .cnt(history.getCnt())
                                 .status(history.getStatus())
                                 .location(history.getMat().getPlace().getLocation())
@@ -116,25 +118,21 @@ public class HistoryService {
                 .build();
     }
 
-    public List<HistorySimpleDto> getUsedHistory(String socialId) {
-        User user = userRepository.searchUserWithUsedHistories(socialId)
+    public History.Status recentMatStatus(String socialId) throws BaseException {
+        User user = userRepository.findBySocialId(socialId)
                 .orElseThrow(() -> new BaseException(NON_EXIST_USER));
-        List<History> histories = user.getHistories();
-        // 돗자리 대여 장소, 대여 시작 시간, 대여 종료 시간, 이용 내역 Id
-        histories.stream().map(history -> HistorySimpleDto.builder()
-                .historyId(history.getId())
-                .location(history.getMat().getPlace().getLocation())
-                .started_time(history.getStarted_time())
-                .returned_time(history.getReturned_time())
-                .build())
-                .collect(Collectors.toList());
 
-        return histories.stream().map(history -> HistorySimpleDto.builder()
-                        .historyId(history.getId())
-                        .location(history.getMat().getPlace().getLocation())
-                        .started_time(history.getStarted_time())
-                        .returned_time(history.getReturned_time())
-                        .build())
-                .collect(Collectors.toList());
+        History history = historyRepository.findTopByUserSocialIdOrderByCreatedAtDesc(socialId);
+        if (history == null || history.getStatus() == History.Status.RETURNED) {
+            return History.Status.RETURNED;
+        }
+        else {
+            Duration duration = Duration.between(history.getStartedTime(), LocalDateTime.now());
+            long hours = duration.toHours();
+            // 대여 시간 내로 대여 중
+            if (hours <= 6) return History.Status.NOT_RETURNED;
+            // 지각
+            else return History.Status.LATE_RETURNED;
+        }
     }
 }
