@@ -2,6 +2,7 @@ package com.example.BackendServer.repository;
 
 import com.example.BackendServer.entity.History;
 import com.example.BackendServer.entity.QHistory;
+import com.example.BackendServer.entity.mat.QMat;
 import com.example.BackendServer.entity.user.QUser;
 import com.example.BackendServer.entity.user.User;
 import com.querydsl.core.types.Predicate;
@@ -17,6 +18,7 @@ import java.util.Optional;
 
 import static com.example.BackendServer.entity.History.Status.NOT_RETURNED;
 import static com.example.BackendServer.entity.QHistory.history;
+import static com.example.BackendServer.entity.mat.QMat.mat;
 import static com.example.BackendServer.entity.user.QUser.user;
 
 
@@ -30,9 +32,11 @@ public class UserCustomRepositoryImpl implements UserCustomRepository{
         User findUser = queryFactory
                 .select(user)
                 .from(user)
-                .join(history).on(eqUsedState().and(checkTime(history)))
+                .join(user.histories, history).on(eqUsedState().and(checkTime(history)))
+                .join(history.mat, mat)//.fetchJoin() 왜 fetchJoin이 안 될까? 첫번쨰 join문이 일대다 관계라 그런가?
                 .where(eqUser(socialId))
                 .fetchOne();
+
         return Optional.ofNullable(findUser);
     }
 

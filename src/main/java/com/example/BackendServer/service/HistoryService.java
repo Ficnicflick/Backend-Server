@@ -1,11 +1,10 @@
 package com.example.BackendServer.service;
 
 import com.example.BackendServer.common.exception.BaseException;
-import com.example.BackendServer.common.response.BaseResponse;
 import com.example.BackendServer.common.response.BaseResponseStatus;
-import com.example.BackendServer.dto.history.request.HistoryStatusRequest;
 import com.example.BackendServer.dto.history.response.DetailsHistoryDto;
 import com.example.BackendServer.dto.history.response.HistoryResponse;
+import com.example.BackendServer.dto.history.response.HistorySimpleDto;
 import com.example.BackendServer.dto.user.UserHistoryDto;
 import com.example.BackendServer.entity.History;
 import com.example.BackendServer.entity.Pay;
@@ -18,11 +17,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -97,7 +94,7 @@ public class HistoryService {
         if(!user.getRoles().contains("ROLE_ADMIN")){
             throw new BaseException(FORBBIDEN_USER_ROLR);
         }
-        History.Status status = History.Status.getStatus(state);;
+        History.Status status = History.Status.getStatus(state);
         Page<History> histories = historyRepository.searchHistoryBy(status, PageRequest.of(pageNumber, HISTORY_PAGE_SIZE));
 
         return HistoryResponse.builder()
@@ -119,10 +116,25 @@ public class HistoryService {
                 .build();
     }
 
-    public Object getUsedHistory(String socialId) {
+    public List<HistorySimpleDto> getUsedHistory(String socialId) {
         User user = userRepository.searchUserWithUsedHistories(socialId)
                 .orElseThrow(() -> new BaseException(NON_EXIST_USER));
+        List<History> histories = user.getHistories();
+        // 돗자리 대여 장소, 대여 시작 시간, 대여 종료 시간, 이용 내역 Id
+        histories.stream().map(history -> HistorySimpleDto.builder()
+                .historyId(history.getId())
+                .location(history.getMat().getPlace().getLocation())
+                .started_time(history.getStarted_time())
+                .returned_time(history.getReturned_time())
+                .build())
+                .collect(Collectors.toList());
 
-        return null;
+        return histories.stream().map(history -> HistorySimpleDto.builder()
+                        .historyId(history.getId())
+                        .location(history.getMat().getPlace().getLocation())
+                        .started_time(history.getStarted_time())
+                        .returned_time(history.getReturned_time())
+                        .build())
+                .collect(Collectors.toList());
     }
 }

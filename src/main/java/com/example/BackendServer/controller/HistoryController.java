@@ -6,6 +6,7 @@ import com.example.BackendServer.common.response.BaseResponse;
 import com.example.BackendServer.dto.history.request.HistoryStatusRequest;
 import com.example.BackendServer.dto.history.response.DetailsHistoryDto;
 import com.example.BackendServer.dto.history.response.HistoryResponse;
+import com.example.BackendServer.dto.history.response.HistorySimpleDto;
 import com.example.BackendServer.dto.user.UserHistoryDto;
 import com.example.BackendServer.entity.History;
 import com.example.BackendServer.service.HistoryService;
@@ -49,7 +50,8 @@ public class    HistoryController {
     }
 
     @GetMapping("/use")
-    public BaseResponse<?> findUsedHistory(@CurrentUser String socialId){
+    public BaseResponse<List<HistorySimpleDto>> findUsedHistory(@CurrentUser String socialId){
+
         return new BaseResponse<>(historyService.getUsedHistory(socialId));
     }
 }
