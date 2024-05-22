@@ -4,6 +4,7 @@ import com.example.BackendServer.common.CurrentUser;
 import com.example.BackendServer.common.exception.BaseException;
 import com.example.BackendServer.common.response.BaseResponse;
 import com.example.BackendServer.dto.history.request.HistoryStatusRequest;
+import com.example.BackendServer.dto.history.response.ActiveMatInfoResponseDto;
 import com.example.BackendServer.dto.history.response.DetailsHistoryDto;
 import com.example.BackendServer.dto.history.response.HistoryResponse;
 import com.example.BackendServer.dto.history.response.HistorySimpleDto;
@@ -54,6 +55,16 @@ public class    HistoryController {
         try {
             History.Status status = historyService.recentMatStatus(socialId);
             return new BaseResponse<>(status);
+        } catch (BaseException e) {
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
+    @GetMapping("/active-mat")
+    public BaseResponse<ActiveMatInfoResponseDto> activeMatInfo(@CurrentUser String socialId) {
+        try {
+            ActiveMatInfoResponseDto activeMatInfoResponseDto = historyService.activeMatInfo(socialId);
+            return new BaseResponse<>(activeMatInfoResponseDto);
         } catch (BaseException e) {
             return new BaseResponse<>(e.getStatus());
         }

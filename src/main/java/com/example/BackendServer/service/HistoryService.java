@@ -1,7 +1,9 @@
 package com.example.BackendServer.service;
 
 import com.example.BackendServer.common.exception.BaseException;
+import com.example.BackendServer.common.response.BaseResponse;
 import com.example.BackendServer.common.response.BaseResponseStatus;
+import com.example.BackendServer.dto.history.response.ActiveMatInfoResponseDto;
 import com.example.BackendServer.dto.history.response.DetailsHistoryDto;
 import com.example.BackendServer.dto.history.response.HistoryResponse;
 import com.example.BackendServer.dto.history.response.HistorySimpleDto;
@@ -12,6 +14,7 @@ import com.example.BackendServer.entity.mat.Mat;
 import com.example.BackendServer.entity.user.Provider;
 import com.example.BackendServer.entity.user.User;
 import com.example.BackendServer.repository.HistoryRepository;
+import com.example.BackendServer.repository.MatRepository;
 import com.example.BackendServer.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,6 +39,7 @@ public class HistoryService {
 
     private final UserRepository userRepository;
     private final HistoryRepository historyRepository;
+    private final MatRepository matRepository;
 
     private final static int HISTORY_PAGE_SIZE = 10;
 
@@ -134,5 +138,29 @@ public class HistoryService {
             // 지각
             else return History.Status.LATE_RETURNED;
         }
+    }
+
+    public ActiveMatInfoResponseDto activeMatInfo(String socialId) throws BaseException {
+        User user = userRepository.findBySocialId(socialId)
+                .orElseThrow(() -> new BaseException(NON_EXIST_USER));
+
+        History history = historyRepository.findTopByUserSocialIdOrderByCreatedAtDesc(socialId);
+        if (history == null || history.getStatus() == History.Status.RETURNED) {
+            return null;
+        }
+
+        Mat mat = matRepository.findById(history.getMat().getId())
+                .orElseThrow(() -> new BaseException(NOT_EXIST_MAT));
+
+        LocalDateTime endTime = mat.getCreatedAt().plusHours(6);
+        long minutesLeft = Duration.between(LocalDateTime.now(), endTime).toMinutes();
+
+        ActiveMatInfoResponseDto activeMatInfoResponseDto = ActiveMatInfoResponseDto.builder()
+                .remainingTime(minutesLeft)
+                .endTime(endTime)
+                .place(mat.getPlace().getLocation())
+                .build();
+
+        return activeMatInfoResponseDto;
     }
 }
