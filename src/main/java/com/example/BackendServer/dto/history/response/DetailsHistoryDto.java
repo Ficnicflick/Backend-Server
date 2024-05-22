@@ -14,6 +14,9 @@ import java.util.List;
 @Getter
 public class DetailsHistoryDto {
 
+    private Long historyId;
+    private String nickname;
+    private String email;
     private LocalDateTime started_time; // 대여 시간
     private LocalDateTime returned_time; // 반납 예정 시간
     private Long matId;
@@ -26,8 +29,11 @@ public class DetailsHistoryDto {
     private int despositPrice; // 보증금
 
     @Builder
-    public DetailsHistoryDto(LocalDateTime started_time, LocalDateTime returned_time,Long matId, int cnt, History.Status status
-            , String location, String itemName, int totalPrice, int rentPrice, int despositPrice) {
+    public DetailsHistoryDto(Long historyId, String nickname, String email,LocalDateTime started_time, LocalDateTime returned_time, Long matId
+            , int cnt, History.Status status, String location, String itemName, int totalPrice, int rentPrice, int despositPrice) {
+        this.historyId = historyId;
+        this.nickname = nickname;
+        this.email = email;
         this.started_time = started_time;
         this.returned_time = returned_time;
         this.matId = matId;
