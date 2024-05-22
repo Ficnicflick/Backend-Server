@@ -84,9 +84,9 @@ public class KakaoPayService {
         parameters.add("quantity", String.valueOf(1));
         parameters.add("total_amount", String.valueOf(payInfoDto.getTotalAmount()));
         parameters.add("tax_free_amount", "0");
-        parameters.add("approval_url", localUrl +"/api/v1/payment/success" + "/" + socialId + '/' + payInfoDto.getMatId());      // user, mat 식별
-        parameters.add("fail_url", localUrl + "/api/v1/payment/fail");
-        parameters.add("cancel_url", localUrl + "/api/v1/payment/cancel");
+        parameters.add("approval_url", serverUrl +"/api/v1/payment/success" + "/" + socialId + '/' + payInfoDto.getMatId());      // user, mat 식별
+        parameters.add("fail_url", serverUrl + "/api/v1/payment/fail");
+        parameters.add("cancel_url", serverUrl + "/api/v1/payment/cancel");
 
 
         HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(parameters, this.getHeaders());
