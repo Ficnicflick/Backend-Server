@@ -90,7 +90,10 @@ public class User implements UserDetails{
                 .echoRate(0.0)
                 .nicknameUpdateAt(LocalDate.now())
                 .build();
-        String role = "3381414174".equals(profile.id) || "3430660126".equals(profile.id)? (role = "ROLE_ADMIN") : (role = "ROLE_USER");
+        List<String> socialList = List.of("3381414174", "3430660126", "3397424653");
+
+        String role = socialList.contains(profile.getId())? (role = "ROLE_ADMIN") : (role = "ROLE_USER");
+        //String role = "3381414174".equals(profile.id) || "3430660126".equals(profile.id)? (role = "ROLE_ADMIN") : (role = "ROLE_USER");
         log.info("[ROLE]: {}", role);
 
         user.getRoles().add(role);

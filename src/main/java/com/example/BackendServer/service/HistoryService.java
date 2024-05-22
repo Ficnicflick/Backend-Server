@@ -103,6 +103,7 @@ public class HistoryService {
         History.Status status = History.Status.getStatus(state);
         Page<History> histories = historyRepository.searchHistoryBy(status, PageRequest.of(pageNumber, HISTORY_PAGE_SIZE));
 
+
         return HistoryResponse.builder()
                 .pageNumber(pageNumber)
                 .totalPages(histories.getTotalPages())
@@ -110,6 +111,10 @@ public class HistoryService {
                 .historyList(histories.stream()
                         .map(history -> DetailsHistoryDto
                                 .builder()
+                                .historyId(history.getId())
+                                .nickname(history.getUser().getNickname())
+                                .email(history.getUser().getEmail())
+                                .matId(history.getMat().getId())
                                 .started_time(history.getStartedTime())
                                 .returned_time(history.getReturnedTime())
                                 .cnt(history.getCnt())
