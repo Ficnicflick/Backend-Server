@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -20,6 +21,9 @@ public interface HistoryRepository extends JpaRepository<History, Long>, History
     Long countByUserSocialId(@Param("socialId") String socialId);
     @Query("SELECT COUNT(h) FROM History h WHERE h.user.socialId = :socialId AND h.status = 'RETURNED'")
     Long countByUserSocialIdAndStatusReturned(@Param("socialId") String socialId);
+
+    @Query("SELECT h FROM History h WHERE h.user.socialId = :socialId AND h.status = 'NOT_RETURNED'")
+    Optional<List<History>> findByUserSocialIdAndStatusNotReturned(@Param("socialId") String socialId);
 
     History findTopByUserSocialIdOrderByCreatedAtDesc(String socialId);
 }

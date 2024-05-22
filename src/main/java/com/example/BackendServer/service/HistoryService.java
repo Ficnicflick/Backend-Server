@@ -144,15 +144,23 @@ public class HistoryService {
         User user = userRepository.findBySocialId(socialId)
                 .orElseThrow(() -> new BaseException(NON_EXIST_USER));
 
-        History history = historyRepository.findTopByUserSocialIdOrderByCreatedAtDesc(socialId);
-        if (history == null || history.getStatus() == History.Status.RETURNED) {
+        Optional<List<History>> historyListOptional = historyRepository.findByUserSocialIdAndStatusNotReturned(socialId);
+        if (historyListOptional.isEmpty()) {
             return null;
         }
+
+        List<History> histories = historyListOptional.get();
+        History history = histories.stream()
+                .filter(h -> h.getCreatedAt().plusHours(6).isAfter(LocalDateTime.now()))    // 지금 시간으로부터 결제 시간이 6시간이 안 지난 내역
+                .findFirst()        // 첫 번째만 찾아서 반환
+                .orElse(null);
+
+        if (history == null) return null;
 
         Mat mat = matRepository.findById(history.getMat().getId())
                 .orElseThrow(() -> new BaseException(NOT_EXIST_MAT));
 
-        LocalDateTime endTime = mat.getCreatedAt().plusHours(6);
+        LocalDateTime endTime = history.getCreatedAt().plusHours(6);
         long minutesLeft = Duration.between(LocalDateTime.now(), endTime).toMinutes();
 
         ActiveMatInfoResponseDto activeMatInfoResponseDto = ActiveMatInfoResponseDto.builder()
