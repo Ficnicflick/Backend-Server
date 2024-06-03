@@ -73,4 +73,10 @@ public class UserController {
             return new BaseResponse<>(e.getStatus());
         }
     }
+
+    @GetMapping("/https")
+    public BaseResponse<String> loadBalanceByHttps(@CurrentUser String socialId) {
+        return new BaseResponse<>("https 성공");
+    }
+
 }
