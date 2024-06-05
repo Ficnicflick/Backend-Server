@@ -2,6 +2,8 @@ package com.example.BackendServer.service;
 
 import com.example.BackendServer.common.exception.BaseException;
 import com.example.BackendServer.common.response.BaseResponseStatus;
+import com.example.BackendServer.dto.ardoino.request.ArdoinoRequest;
+import com.example.BackendServer.dto.ardoino.response.ArdoinoDeviceResponse;
 import com.example.BackendServer.entity.History;
 import com.example.BackendServer.entity.Pay;
 import com.example.BackendServer.entity.mat.Mat;
@@ -51,6 +53,7 @@ public class KakaoPayService {
     private final HistoryRepository historyRepository;
     private final UserRepository userRepository;
     private final MatRepository matRepository;
+    private final ArdoinoService ardoinoService;
 
     private String localUrl = "http://localhost:8080";
 
@@ -140,6 +143,11 @@ public class KakaoPayService {
                 requestEntity,
                 KakaoApproveResponse.class
         );
+
+        ArdoinoDeviceResponse ardoinoDeviceResponse = ardoinoService.unlockDivice(ArdoinoRequest.builder()
+                .matId(matId)
+                .change("unlock")
+                .build()); // 기계 해제
 
         // 돗자리 상태 변경
         Mat mat = optionalMat.get();
@@ -257,6 +265,10 @@ public class KakaoPayService {
         } catch (RestClientException e) {
             throw e;
         }
+        ardoinoService.lockDivice(ArdoinoRequest.builder()
+                .matId(mat.getId())
+                .change("lock")
+                .build());
 
         mat.getMatCheck().changeMatStatus(MatStatus.AVAILABLE);     // 돗자리 상태 사용가능으로 변경
 
